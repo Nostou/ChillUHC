@@ -1,0 +1,7 @@
+name: ChillUHC
+version: '1.0'
+main: fr.Nosta.ChillUHC.Main
+api-version: '1.21'
+commands:
+    hf:
+        description: Main command for ChillUHC plugin
