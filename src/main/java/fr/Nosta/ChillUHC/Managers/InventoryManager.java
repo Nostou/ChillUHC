@@ -18,8 +18,7 @@ public class InventoryManager {
     }
 
     public void openTeamInventory(Player player) {
-        TeamManager teamManager = plugin.getManager(TeamManager.class);
-        TeamInventory inventory = new TeamInventory(teamManager);
+        TeamInventory inventory = new TeamInventory(plugin.getTeamManager());
         inventory.open(player);
     }
 }

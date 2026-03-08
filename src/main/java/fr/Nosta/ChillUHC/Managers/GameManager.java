@@ -8,8 +8,6 @@ import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,9 +46,9 @@ public class GameManager {
         world.setThundering(false);
         world.setWeatherDuration(Integer.MAX_VALUE);
 
-        plugin.getManager(ScoreboardManager.class).initialize();
-        plugin.getManager(BorderManager.class).initialize();
-        plugin.getManager(TabManager.class).start();
+        plugin.getBorderManager().initialize();
+        plugin.getScoreboardManager().initialize();
+        plugin.getTabManager().start();
 
         plugin.getLogger().warning("Game initialized.");
     }
@@ -58,15 +56,14 @@ public class GameManager {
     public void startGame() {
         currentState = GameState.STARTING;
         startTask = new StartGameTask(plugin);
-        startTask.start(20L);
+        startTask.start();
         startTask.OnCompleted.addListener((runnable) -> onGameStart());
     }
 
     public void onGameStart() {
         currentState = GameState.PLAYING;
 
-        teleportAll();
-        plugin.getManager(BorderManager.class).startShrink();
+        plugin.getBorderManager().startShrink();
 
         World world = plugin.getWorld();
         world.setDifficulty(Difficulty.EASY);
@@ -84,9 +81,8 @@ public class GameManager {
             player.setGameMode(GameMode.SURVIVAL);
         }
 
-        CompassManager manager = plugin.getManager(CompassManager.class);
-        compassTask = new CompassTask(plugin, manager);
-        compassTask.start(10L);
+        compassTask = new CompassTask(plugin);
+        compassTask.start();
     }
 
     public void stopGame() {
@@ -104,7 +100,7 @@ public class GameManager {
         CustomMessage.errorAll("Forced stop of the game by an operator.");
         currentState = GameState.WAITING;
 
-        plugin.getManager(BorderManager.class).reset();
+        plugin.getBorderManager().reset();
     }
 
     private void reset() {
@@ -113,32 +109,5 @@ public class GameManager {
         world.setGameRule(GameRules.PVP, false);
         world.setGameRule(GameRules.ADVANCE_TIME, false);
         world.setTime(1000);
-    }
-
-    private void teleportAll() {
-        String cmd = "spreadplayers %d %d %d %d %s @a";
-        World world = plugin.getWorld();
-        int centerX = world.getSpawnLocation().getBlockX();
-        int centerZ = world.getSpawnLocation().getBlockZ();
-        int radius = plugin.getManager(BorderManager.class).getStartRadius();
-
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-
-        int teamCount = 0;
-        for (Team team : scoreboard.getTeams()) {
-            long onlineMembers = team.getEntries().stream()
-                    .filter(entry -> Bukkit.getPlayerExact(entry) != null)
-                    .count();
-
-            if (onlineMembers > 0) teamCount++;
-        }
-
-        String respectTeams = teamCount > 1 ? "true" : "false";
-
-        int minDistance = (int)(radius / Math.sqrt(Math.max(1,teamCount)));
-        minDistance = Math.max(minDistance, 50);
-
-        String command = String.format(cmd, centerX, centerZ, minDistance, radius, respectTeams);
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 }

@@ -13,12 +13,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import javax.swing.border.Border;
+
 public class GameCommands implements CommandExecutor {
 
     private final Main plugin;
-    private GameManager getGameManager() { return plugin.getManager(GameManager.class); }
-    private InventoryManager getInventoryManager() { return plugin.getManager(InventoryManager.class); }
-    private BorderManager getWorldBorderManager() { return plugin.getManager(BorderManager.class); }
 
     public GameCommands(Main plugin) {
         this.plugin = plugin;
@@ -38,21 +37,24 @@ public class GameCommands implements CommandExecutor {
     }
 
     private void HandleOpCommands(Player player, String[] args) {
+        BorderManager bm = plugin.getBorderManager();
+        GameManager gm = plugin.getGameManager();
+
         if (args[0].equalsIgnoreCase("start")) {
-            if (getGameManager().getState() != GameState.WAITING) {
+            if (gm.getState() != GameState.WAITING) {
                 CustomMessage.error(player, "A game is already in progress.");
                 return;
             }
 
-            getGameManager().startGame();
+            gm.startGame();
         }
         else if (args[0].equalsIgnoreCase("stop")) {
-            if (getGameManager().getState() == GameState.WAITING) {
+            if (gm.getState() == GameState.WAITING) {
                 CustomMessage.error(player, "No game is currently running.");
                 return;
             }
 
-            getGameManager().stopGame();
+            gm.stopGame();
         }
 
         else if (args[0].equalsIgnoreCase("border")) {
@@ -61,27 +63,26 @@ public class GameCommands implements CommandExecutor {
                 return;
             }
 
-            BorderManager wbManager = getWorldBorderManager();
             int startRadius = Integer.parseInt(args[1]);
             if (startRadius <= 0) startRadius = 1;
-            wbManager.setStartRadius(startRadius);
+            bm.setStartRadius(startRadius);
 
             if (args.length > 2) {
                 int targetRadius = Integer.parseInt(args[2]);
                 if (targetRadius <= 0) targetRadius = 1;
-                wbManager.setTargetRadius(targetRadius);
+                bm.setTargetRadius(targetRadius);
             }
 
             if (args.length > 3) {
                 double meetupMinutes = Double.parseDouble(args[3]);
                 if (meetupMinutes <= 0) meetupMinutes = 1.0 / 60.0;
-                wbManager.setMeetupDuration((long)(meetupMinutes*60));
+                bm.setMeetupDuration((long)(meetupMinutes*60));
             }
 
             if (args.length > 4) {
                 double shrinkMinutes = Double.parseDouble(args[3]);
                 if (shrinkMinutes <= 0) shrinkMinutes = 1.0 / 60.0;
-                wbManager.setShrinkDuration((long)(shrinkMinutes*60));
+                bm.setShrinkDuration((long)(shrinkMinutes*60));
             }
 
             CustomMessage.success(player, "WorldBorder has been updated !");
@@ -89,8 +90,11 @@ public class GameCommands implements CommandExecutor {
     }
 
     private void HandleNonOpCommands(Player player, String[] args) {
+        GameManager gm = plugin.getGameManager();
+        InventoryManager im = plugin.getInventoryManager();
+
         if (args[0].equalsIgnoreCase("invsee")) {
-            if (!player.isOp() && player.getGameMode() != GameMode.SPECTATOR) {
+            if (!player.isOp() && (player.getGameMode() != GameMode.SPECTATOR || plugin.getGameManager().getState() != GameState.PLAYING)) {
                 CustomMessage.error(player, "You don't have permission to use this command.");
                 return;
             }
@@ -106,15 +110,15 @@ public class GameCommands implements CommandExecutor {
                 return;
             }
 
-            getInventoryManager().openInvSeeInventory(player, target);
+            im.openInvSeeInventory(player, target);
         }
         else if (args[0].equalsIgnoreCase("team")) {
-            if (getGameManager().getState() != GameState.WAITING) {
+            if (gm.getState() != GameState.WAITING) {
                 CustomMessage.error(player, "Team selection is not available.");
                 return;
             }
 
-            getInventoryManager().openTeamInventory(player);
+            im.openTeamInventory(player);
         }
     }
 }

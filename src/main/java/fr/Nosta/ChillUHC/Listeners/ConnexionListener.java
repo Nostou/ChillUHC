@@ -3,7 +3,7 @@ package fr.Nosta.ChillUHC.Listeners;
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Managers.GameManager;
-import fr.Nosta.ChillUHC.Managers.PlayerManager;
+import fr.Nosta.ChillUHC.Managers.TeamManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
@@ -26,9 +26,8 @@ public class ConnexionListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        plugin.getManager(PlayerManager.class).addChillPlayer(player);
 
-        if (plugin.getManager(GameManager.class).getState() != GameState.PLAYING) {
+        if (plugin.getGameManager().getState() != GameState.PLAYING) {
             player.teleport(plugin.getSpawnLocation());
             player.setGameMode(GameMode.ADVENTURE);
         }
@@ -47,7 +46,6 @@ public class ConnexionListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        plugin.getManager(PlayerManager.class).removeChillPlayer(player);
 
         Component message = Component.text("[", NamedTextColor.DARK_GRAY)
                 .append(Component.text("-", NamedTextColor.RED))

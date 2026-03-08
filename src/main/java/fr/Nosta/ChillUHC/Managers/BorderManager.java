@@ -65,7 +65,7 @@ public class BorderManager {
         cancelShrink();
         meetupEndTimestamp = System.currentTimeMillis() + (meetupDuration * 1000);
         activeTask = new WorldBorderTask(plugin, this);
-        activeTask.start(20L);
+        activeTask.start();
         activeTask.OnCompleted.addListener((runnable) -> changeRadius());
     }
 

@@ -1,7 +1,7 @@
 package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Main;
-import fr.Nosta.ChillUHC.Managers.PlayerManager;
+import fr.Nosta.ChillUHC.Managers.TeamManager;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.scoreboard.Team;
 
 import java.util.Set;
 
@@ -43,7 +44,6 @@ public class PvPListener implements Listener {
     );
 
     private final Main plugin;
-    private PlayerManager getPlayerManager() { return plugin.getManager(PlayerManager.class); }
 
     public PvPListener(Main plugin) {
         this.plugin = plugin;
@@ -152,9 +152,9 @@ public class PvPListener implements Listener {
             if (target.isDead()) return;
 
             int halfHearts = (int)(target.getHealth() + target.getAbsorptionAmount());
-            NamedTextColor playerColor = getPlayerManager().getChillPlayer(target).getColor();
+            Team playerTeam = plugin.getTeamManager().getTeam(target);
 
-            Component msg = Component.text(target.getName(), playerColor)
+            Component msg = Component.text(target.getName(), playerTeam.color())
                     .append(Component.text(" is now at ", NamedTextColor.GRAY))
                     .append(getColoredHealth(halfHearts));
 

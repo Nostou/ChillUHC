@@ -5,7 +5,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public final class CustomMessage {
+public class CustomMessage {
 
     private CustomMessage() {}
 

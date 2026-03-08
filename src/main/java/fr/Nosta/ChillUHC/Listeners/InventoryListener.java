@@ -1,6 +1,5 @@
 package fr.Nosta.ChillUHC.Listeners;
 
-import fr.Nosta.ChillUHC.Chill.ChillTeam;
 import fr.Nosta.ChillUHC.Inventories.InvSeeInventory;
 import fr.Nosta.ChillUHC.Inventories.TeamInventory;
 import fr.Nosta.ChillUHC.Main;
@@ -15,14 +14,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scoreboard.Team;
 
 public class InventoryListener implements Listener {
 
     private final Main plugin;
-
-    public TeamManager getTeamManager() {
-        return plugin.getManager(TeamManager.class);
-    }
 
     public InventoryListener(Main plugin) {
         this.plugin = plugin;
@@ -45,15 +41,14 @@ public class InventoryListener implements Listener {
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem == null) return;
 
-            TeamManager tm = getTeamManager();
+            TeamManager tm = plugin.getTeamManager();
             if (clickedItem.getType() == Material.BARRIER) {
                 tm.setPlayerTeam(player, null);
                 player.closeInventory();
                 return;
             }
 
-            ChillTeam newTeam = tm.getChillTeam(getDisplayName(clickedItem));
-            tm.setPlayerTeam(player, newTeam);
+            tm.setPlayerTeam(player, getDisplayName(clickedItem));
             player.closeInventory();
         }
     }

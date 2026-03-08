@@ -37,7 +37,7 @@ public class DeathListener implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
 
-        if (plugin.getManager(GameManager.class).getState() == GameState.PLAYING) {
+        if (plugin.getGameManager().getState() == GameState.PLAYING) {
             Player player = event.getPlayer();
             player.setGameMode(GameMode.SPECTATOR);
         }

@@ -12,9 +12,7 @@ import java.time.Duration;
 public class Broadcaster {
 
     public static void titleAll(String title, NamedTextColor color, int fadeIn, int stay, int fadeOut) {
-        Title t = Title.title(
-                Component.text(title, color),
-                Component.empty(),
+        Title t = Title.title(Component.text(title, color), Component.empty(),
                 Title.Times.times(Duration.ofMillis(fadeIn), Duration.ofMillis(stay), Duration.ofMillis(fadeOut))
         );
 

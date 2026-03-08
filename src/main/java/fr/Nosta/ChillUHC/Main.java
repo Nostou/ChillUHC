@@ -24,7 +24,7 @@ public final class Main extends JavaPlugin
         registerListeners();
         registerCommands();
 
-        //Wait for other plugins to load such as UHC_GENERATION
+        //Wait for other plugins to load such as UHC_GENERATION (one tick)
         Bukkit.getScheduler().runTask(this, () -> {
             getManager(GameManager.class).initGame();
         });
@@ -36,7 +36,6 @@ public final class Main extends JavaPlugin
         registerManager(new CompassManager(this));
         registerManager(new GameManager(this));
         registerManager(new InventoryManager(this));
-        registerManager(new PlayerManager(this));
         registerManager(new ScoreboardManager(this));
         registerManager(new TabManager(this));
         registerManager(new TeamManager(this));
@@ -67,6 +66,14 @@ public final class Main extends JavaPlugin
     {
         return c.cast(managers.get(c));
     }
+    public BorderManager getBorderManager() { return getManager(BorderManager.class); }
+    public CompassManager getCompassManager() { return getManager(CompassManager.class); }
+    public GameManager getGameManager() { return getManager(GameManager.class); }
+    public InventoryManager getInventoryManager() { return getManager(InventoryManager.class); }
+    public ScoreboardManager getScoreboardManager() { return getManager(ScoreboardManager.class); }
+    public TabManager getTabManager() { return getManager(TabManager.class); }
+    public TeamManager getTeamManager() { return getManager(TeamManager.class); }
+
     public World getWorld() { return world; }
     public Location getSpawnLocation() { return world.getSpawnLocation().clone().add(0.5, 0, 0.5); }
 }

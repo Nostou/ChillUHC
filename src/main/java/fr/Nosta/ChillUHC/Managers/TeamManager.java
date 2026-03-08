@@ -1,7 +1,5 @@
 package fr.Nosta.ChillUHC.Managers;
 
-import fr.Nosta.ChillUHC.Chill.ChillPlayer;
-import fr.Nosta.ChillUHC.Chill.ChillTeam;
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
@@ -11,16 +9,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TeamManager {
 
     private final Main plugin;
-
     private final Scoreboard scoreboard;
 
-    private final Map<String, ChillTeam> teams = new HashMap<>();
+    private final Map<String, Team> teams = new HashMap<>();
+    private final Map<String, Team> playerTeams = new HashMap<>();
 
     public TeamManager(Main plugin) {
         this.plugin = plugin;
@@ -34,6 +31,8 @@ public class TeamManager {
         createTeam("Purple", NamedTextColor.DARK_PURPLE);
         createTeam("Red", NamedTextColor.RED);
         createTeam("Yellow", NamedTextColor.YELLOW);
+
+        loadExistingTeams();
     }
 
     private void createTeam(String name, NamedTextColor color) {
@@ -43,37 +42,46 @@ public class TeamManager {
         team.color(color);
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 
-        ChillTeam chillTeam = new ChillTeam(name, color, team);
-        teams.put(name, chillTeam);
+        teams.put(name, team);
     }
 
-    public ChillTeam getChillTeam(String teamName) { return teams.get(teamName); }
+    private void loadExistingTeams() {
+        for (Team team : scoreboard.getTeams()) {
+            if (!teams.containsKey(team.getName())) continue;
 
-    public void setPlayerTeam(Player player, ChillTeam newTeam) {
-        PlayerManager playerManager = plugin.getManager(PlayerManager.class);
-        ChillPlayer chillPlayer = playerManager.getChillPlayer(player);
+            for (String entry : team.getEntries()) {
+                playerTeams.put(entry, team);
+            }
+        }
+    }
 
-        ChillTeam previousTeam = chillPlayer.getTeam();
+    public void setPlayerTeam(Player player, String teamName) {
+        Team previousTeam = playerTeams.get(player.getName());
+        Team newTeam = teamName != null ? teams.get(teamName) : null;
 
         if (previousTeam != null) {
-            previousTeam.removePlayer(player.getUniqueId());
-            previousTeam.getTeam().removeEntry(player.getName());
+            previousTeam.removeEntry(player.getName());
         }
 
-        chillPlayer.setTeam(newTeam);
-
         if (newTeam != null) {
-            newTeam.addPlayer(player.getUniqueId());
-            newTeam.getTeam().addEntry(player.getName());
+            newTeam.addEntry(player.getName());
+            playerTeams.put(player.getName(), newTeam);
+
             Component msg = Component.text("You are now ", NamedTextColor.WHITE)
-                    .append(Component.text(newTeam.getName(), newTeam.getColor()));
+                    .append(Component.text(newTeam.getName(), newTeam.color()));
+
             CustomMessage.custom(player, NamedTextColor.YELLOW, msg);
         }
         else {
+            playerTeams.remove(player.getName());
             Component msg = Component.text("You left your team", NamedTextColor.WHITE);
             CustomMessage.custom(player, NamedTextColor.YELLOW, msg);
         }
 
         player.setScoreboard(scoreboard);
     }
+
+    public Team getTeam(String teamName) { return teams.get(teamName); }
+    public Team getTeam(Player player) { return playerTeams.get(player.getName()); }
+    public List<Team> getAllTeams() { return teams.values().stream().toList(); }
 }

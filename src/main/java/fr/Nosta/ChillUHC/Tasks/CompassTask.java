@@ -11,13 +11,13 @@ public class CompassTask extends BukkitRunnable {
     private final Main plugin;
     private final CompassManager manager;
 
-    public CompassTask(Main plugin, CompassManager manager) {
+    public CompassTask(Main plugin) {
         this.plugin = plugin;
-        this.manager = manager;
+        this.manager = plugin.getCompassManager();
     }
 
-    public void start(long periodTicks) {
-        runTaskTimer(plugin, 0L, periodTicks);
+    public void start() {
+        runTaskTimer(plugin, 0L, 10L);
     }
 
     @Override

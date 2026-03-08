@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 public class TabManager {
 
     private final Main plugin;
-    public GameManager getGameManager() { return plugin.getManager(GameManager.class); }
-    public BorderManager getWorldBorderManager() { return plugin.getManager(BorderManager.class); }
 
     public TabManager(Main plugin) {
         this.plugin = plugin;
@@ -31,14 +29,14 @@ public class TabManager {
     }
 
     private Component getFooter() {
-        BorderManager wb = getWorldBorderManager();
-        GameState currentState = getGameManager().getState();
+        GameState currentState = plugin.getGameManager().getState();
+        BorderManager bm = plugin.getBorderManager();
 
         if (currentState != GameState.PLAYING) {
-            int startRadius = wb.getStartRadius();
-            String meetupDuration = TimeUtils.formatToMMSS(wb.getMeetupDuration());
-            int targetRadius = wb.getTargetRadius();
-            String shrinkDuration = TimeUtils.formatToMMSS(wb.getShrinkDuration());
+            int startRadius = bm.getStartRadius();
+            String meetupDuration = TimeUtils.formatToMMSS(bm.getMeetupDuration());
+            int targetRadius = bm.getTargetRadius();
+            String shrinkDuration = TimeUtils.formatToMMSS(bm.getShrinkDuration());
 
             return Component.text("\nMeetup: ", NamedTextColor.GRAY)
                     .append(Component.text(startRadius+"x"+startRadius, NamedTextColor.GREEN))
@@ -48,14 +46,14 @@ public class TabManager {
                     .append(Component.text(" ("+shrinkDuration+")", NamedTextColor.YELLOW));
         }
 
-        int currentRadius = wb.getCurrentRadius();
-        if (wb.isShrinking()) {
+        int currentRadius = bm.getCurrentRadius();
+        if (bm.isShrinking()) {
             return Component.text("\nBorder: ", NamedTextColor.GRAY)
                     .append(Component.text(currentRadius+"x"+currentRadius, NamedTextColor.GREEN))
                     .append(Component.text("\nMeetup is now !", NamedTextColor.GOLD, TextDecoration.BOLD));
         }
 
-        String time = TimeUtils.formatToMMSS(wb.getMeetupEnd());
+        String time = TimeUtils.formatToMMSS(bm.getMeetupEnd());
         return Component.text("\nBorder: ", NamedTextColor.GRAY)
                 .append(Component.text(currentRadius+"x" +currentRadius, NamedTextColor.GREEN))
                 .append(Component.text("\nMeetup: ", NamedTextColor.GRAY))

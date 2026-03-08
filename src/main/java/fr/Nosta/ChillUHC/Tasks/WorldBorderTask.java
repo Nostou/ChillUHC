@@ -19,8 +19,8 @@ public class WorldBorderTask extends BukkitRunnable {
         this.remainingSeconds = manager.getMeetupDuration();
     }
 
-    public void start(long periodTicks) {
-        runTaskTimer(plugin, 0L, periodTicks);
+    public void start() {
+        runTaskTimer(plugin, 0L, 20L);
     }
 
     @Override

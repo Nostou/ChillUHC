@@ -1,7 +1,7 @@
 package fr.Nosta.ChillUHC.Inventories;
 
-import fr.Nosta.ChillUHC.Chill.ChillTeam;
 import fr.Nosta.ChillUHC.Managers.TeamManager;
+import fr.Nosta.ChillUHC.Utils.TeamUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class TeamInventory implements InventoryHolder {
 
@@ -48,13 +47,11 @@ public class TeamInventory implements InventoryHolder {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        ChillTeam team = teamManager.getChillTeam(teamName);
-        meta.displayName(Component.text(teamName, team.getColor()));
+        Team team = teamManager.getTeam(teamName);
+        meta.displayName(Component.text(teamName, team.color()));
 
         List<Component> lore = new ArrayList<>();
-        for (UUID uuid : team.getPlayers()) {
-            Player p = Bukkit.getPlayer(uuid);
-            if (p == null) continue;
+        for (Player p : TeamUtils.getPlayers(team)) {
             lore.add(Component.text("- " + p.getName(), NamedTextColor.GRAY));
         }
 

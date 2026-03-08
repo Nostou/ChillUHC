@@ -1,8 +1,7 @@
 package fr.Nosta.ChillUHC.Managers;
 
-import fr.Nosta.ChillUHC.Chill.ChillPlayer;
-import fr.Nosta.ChillUHC.Chill.ChillTeam;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Utils.TeamUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -15,7 +14,6 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 public class CompassManager {
 
@@ -41,14 +39,11 @@ public class CompassManager {
                 .append(Component.text(centerDistance + "m", NamedTextColor.WHITE));
 
         // ===== TEAM ALLIES =====
-        ChillPlayer chillPlayer = plugin.getManager(PlayerManager.class).getChillPlayer(player);
-        ChillTeam team = chillPlayer.getTeam();
+        Team team = plugin.getTeamManager().getTeam(player);
 
         if (team != null) {
-
             List<Player> allies = new ArrayList<>();
-            for (UUID uuid : team.getPlayers()) {
-                Player ally = Bukkit.getPlayer(uuid);
+            for (Player ally : TeamUtils.getPlayers(team)) {
                 if (ally == null) continue;
                 if (!ally.isOnline()) continue;
                 if (ally.getGameMode() == GameMode.SPECTATOR) continue;
@@ -60,15 +55,13 @@ public class CompassManager {
             allies.sort(Comparator.comparing(Player::getName, String.CASE_INSENSITIVE_ORDER));
 
             if (!allies.isEmpty()) {
-                NamedTextColor allyColor = team.getColor();
-
                 for (Player ally : allies) {
                     double allyAngle = computeAngle(playerLoc, ally.getLocation(), true);
                     String allyArrow = getArrow(allyAngle);
                     int allyDistance = (int)playerLoc.distance(ally.getLocation());
 
                     message = message.append(Component.text(" | ", NamedTextColor.DARK_GRAY))
-                            .append(Component.text(allyArrow + " " + ally.getName() + " ", allyColor))
+                            .append(Component.text(allyArrow + " " + ally.getName() + " ", team.color()))
                             .append(Component.text(allyDistance + "m", NamedTextColor.WHITE));
                 }
             }
