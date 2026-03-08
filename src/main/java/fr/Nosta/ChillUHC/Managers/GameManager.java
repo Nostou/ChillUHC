@@ -8,6 +8,8 @@ import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -74,11 +76,16 @@ public class GameManager {
         ItemStack food = new ItemStack(Material.COOKED_BEEF, 10);
         List<ItemStack> starterItems = Arrays.asList(book, food);
 
+        List<PotionEffect> starterEffects = Arrays.asList(
+                new PotionEffect(PotionEffectType.RESISTANCE, 30 * 20, 4, false, false),
+                new PotionEffect(PotionEffectType.ABSORPTION, 1200 * 20, 4, false, false)
+        );
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.give(starterItems);
             player.setFoodLevel(20);
             player.setSaturation(20f);
             player.setGameMode(GameMode.SURVIVAL);
+            player.addPotionEffects(starterEffects);
         }
 
         compassTask = new CompassTask(plugin);

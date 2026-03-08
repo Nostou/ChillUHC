@@ -7,6 +7,7 @@ import fr.Nosta.ChillUHC.Utils.Broadcaster;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -36,7 +37,6 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-
         if (plugin.getGameManager().getState() == GameState.PLAYING) {
             Player player = event.getPlayer();
             player.setGameMode(GameMode.SPECTATOR);
@@ -61,6 +61,7 @@ public class DeathListener implements Listener {
         Location loc = player.getLocation();
 
         List<ItemStack> drops = new ArrayList<>(event.getDrops());
+        drops.add(new ItemStack(Material.GOLDEN_APPLE, 1));
         event.getDrops().clear();
 
         for (ItemStack item : drops) {
