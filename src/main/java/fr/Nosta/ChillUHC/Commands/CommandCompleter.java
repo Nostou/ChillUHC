@@ -40,6 +40,7 @@ public class CommandCompleter implements TabCompleter {
             if ("start".startsWith(args[0].toLowerCase())) result.add("start");
             if ("stop".startsWith(args[0].toLowerCase())) result.add("stop");
             if ("border".startsWith(args[0].toLowerCase())) result.add("border");
+            if ("tier".startsWith(args[0].toLowerCase())) result.add("tier");
         }
 
         else if (args.length == 2 && args[0].equalsIgnoreCase("border")) {
@@ -64,6 +65,7 @@ public class CommandCompleter implements TabCompleter {
         if (args.length == 1) {
             if ("invsee".startsWith(args[0].toLowerCase())) result.add("invsee");
             if ("team".startsWith(args[0].toLowerCase())) result.add("team");
+            if ("tiersee".startsWith(args[0].toLowerCase())) result.add("tiersee");
         }
 
         else if (args.length == 2 && args[0].equalsIgnoreCase("invsee")) {

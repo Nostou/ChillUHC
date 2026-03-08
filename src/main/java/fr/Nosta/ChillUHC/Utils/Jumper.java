@@ -11,6 +11,7 @@ public class Jumper {
 
     private static void onJumpStart(Player player) {
         player.setGameMode(GameMode.SPECTATOR);
+        player.setFlying(true);
         player.setAllowFlight(true);
         player.setGravity(false);
         player.setInvulnerable(true);
@@ -20,6 +21,7 @@ public class Jumper {
 
     private static void onJumpEnd(Player player) {
         player.setGameMode(GameMode.SURVIVAL);
+        player.setFlying(false);
         player.setAllowFlight(false);
         player.setGravity(true);
         player.setInvulnerable(false);
@@ -28,7 +30,6 @@ public class Jumper {
     }
 
     public static void jump(Main plugin, Player player, Location end, double height, int durationTicks) {
-
         onJumpStart(player);
 
         Location start = player.getLocation().clone();
@@ -64,8 +65,13 @@ public class Jumper {
                 Vector currentPoint = bezierPoint(start, control, end, t);
 
                 Vector velocity = currentPoint.clone().subtract(prevPoint);
-                Vector correction = currentPoint.clone().subtract(player.getLocation().toVector()).multiply(0.5);
-                velocity.add(correction);
+                Vector correction = currentPoint.clone().subtract(player.getLocation().toVector());
+
+                double maxCorrection = 1.5;
+                if (correction.length() > maxCorrection) {
+                    correction.normalize().multiply(maxCorrection);
+                }
+                velocity.add(correction.multiply(0.5));
 
                 player.setVelocity(velocity);
                 tick++;

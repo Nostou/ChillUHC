@@ -2,8 +2,10 @@ package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Inventories.InvSeeInventory;
 import fr.Nosta.ChillUHC.Inventories.TeamInventory;
+import fr.Nosta.ChillUHC.Inventories.TierInventory;
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Managers.TeamManager;
+import fr.Nosta.ChillUHC.Managers.TierManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
@@ -13,7 +15,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scoreboard.Team;
 
 public class InventoryListener implements Listener {
@@ -30,6 +34,8 @@ public class InventoryListener implements Listener {
         if (event.getClickedInventory() == null) return;
 
         Inventory topInv = event.getView().getTopInventory();
+        InventoryHolder holder = topInv.getHolder();
+
         if (InvSeeInventory.isInvSeeInventory(topInv)) {
             event.setCancelled(true);
             return;
@@ -50,6 +56,24 @@ public class InventoryListener implements Listener {
 
             tm.setPlayerTeam(player, getDisplayName(clickedItem));
             player.closeInventory();
+            return;
+        }
+
+        if (TierInventory.isTierInventory(topInv)) {
+            event.setCancelled(true);
+
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem == null || clickedItem.getType() != Material.PLAYER_HEAD) return;
+
+            SkullMeta meta = (SkullMeta) clickedItem.getItemMeta();
+            Player target = meta.getOwningPlayer().getPlayer();
+
+            if (target == null) return;
+            TierManager tierManager = plugin.getTierManager();
+
+            if (event.isLeftClick()) tierManager.increaseTier(target);
+            if (event.isRightClick()) tierManager.decreaseTier(target);
+            if (holder instanceof TierInventory inv) inv.update();
         }
     }
 

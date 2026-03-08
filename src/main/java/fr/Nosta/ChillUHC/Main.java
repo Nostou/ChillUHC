@@ -39,6 +39,7 @@ public final class Main extends JavaPlugin
         registerManager(new ScoreboardManager(this));
         registerManager(new TabManager(this));
         registerManager(new TeamManager(this));
+        registerManager(new TierManager(this));
     }
 
     private <T> void registerManager(T manager)
@@ -73,6 +74,7 @@ public final class Main extends JavaPlugin
     public ScoreboardManager getScoreboardManager() { return getManager(ScoreboardManager.class); }
     public TabManager getTabManager() { return getManager(TabManager.class); }
     public TeamManager getTeamManager() { return getManager(TeamManager.class); }
+    public TierManager getTierManager() { return getManager(TierManager.class); }
 
     public World getWorld() { return world; }
     public Location getSpawnLocation() { return world.getSpawnLocation().clone().add(0.5, 0, 0.5); }

@@ -82,6 +82,7 @@ public class GameManager {
         );
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.give(starterItems);
+            player.setHealth(20);
             player.setFoodLevel(20);
             player.setSaturation(20f);
             player.setGameMode(GameMode.SURVIVAL);
@@ -99,6 +100,7 @@ public class GameManager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.teleport(plugin.getSpawnLocation());
             player.getInventory().clear();
+            player.clearActivePotionEffects();
             player.setGameMode(GameMode.ADVENTURE);
         }
 

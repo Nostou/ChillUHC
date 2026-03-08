@@ -84,4 +84,9 @@ public class TeamManager {
     public Team getTeam(String teamName) { return teams.get(teamName); }
     public Team getTeam(Player player) { return playerTeams.get(player.getName()); }
     public List<Team> getAllTeams() { return teams.values().stream().toList(); }
+
+    public NamedTextColor getColor(Player player) {
+        Team team = playerTeams.get(player.getName());
+        return team != null ? (NamedTextColor)team.color() : NamedTextColor.WHITE;
+    }
 }

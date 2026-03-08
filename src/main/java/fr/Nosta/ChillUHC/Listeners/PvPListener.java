@@ -93,6 +93,10 @@ public class PvPListener implements Listener {
             return;
         }
 
+        if (projectile instanceof AbstractArrow) {
+            event.setDamage(event.getDamage() * 0.8);
+        }
+
         if (DISABLED_ITEMS.contains(Material.SHIELD) && defender.isBlocking()) {
             handleShieldBlock(event, shooter, defender);
 
@@ -151,10 +155,10 @@ public class PvPListener implements Listener {
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (target.isDead()) return;
 
-            int halfHearts = (int)(target.getHealth() + target.getAbsorptionAmount());
-            Team playerTeam = plugin.getTeamManager().getTeam(target);
+            int halfHearts = (int)(target.getHealth() + target.getAbsorptionAmount())+1;
+            NamedTextColor playerColor = plugin.getTeamManager().getColor(target);
 
-            Component msg = Component.text(target.getName(), playerTeam.color())
+            Component msg = Component.text(target.getName(), playerColor)
                     .append(Component.text(" is now at ", NamedTextColor.GRAY))
                     .append(getColoredHealth(halfHearts));
 

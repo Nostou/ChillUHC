@@ -44,7 +44,6 @@ public class InvSeeInventory implements InventoryHolder {
     public @NotNull Inventory getInventory() {
         return inventory;
     }
-
     public static boolean isInvSeeInventory(Inventory inventory) {
         return inventory.getHolder() instanceof InvSeeInventory;
     }

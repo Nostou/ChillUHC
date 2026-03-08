@@ -19,25 +19,35 @@ public class ScoreboardManager {
     }
 
     public void initialize() {
-        removeObjective("health");
-        removeObjective("kills");
+        removeObjective("Health");
+        removeObjective("Kills");
+        removeObjective("Tier");
 
         registerHealthObjective();
         registerKillsObjective();
+        registerTierObjective();
     }
 
     private void registerHealthObjective() {
-        Objective health = scoreboard.registerNewObjective("health", Criteria.HEALTH, Component.text("❤"));
+        Objective health = scoreboard.registerNewObjective("Health", Criteria.HEALTH, Component.text("❤"));
         health.setDisplaySlot(DisplaySlot.PLAYER_LIST);
     }
 
     private void registerKillsObjective() {
-        Objective kills = scoreboard.registerNewObjective("kills", Criteria.PLAYER_KILL_COUNT, Component.text("Kills"));
+        Objective kills = scoreboard.registerNewObjective("Kills", Criteria.PLAYER_KILL_COUNT, Component.text("Kills"));
         kills.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
+    private void registerTierObjective() {
+        Objective tier = scoreboard.registerNewObjective("Tier", Criteria.DUMMY, Component.text("Tier"));
     }
 
     private void removeObjective(String name) {
         Objective obj = scoreboard.getObjective(name);
         if (obj != null) obj.unregister();
+    }
+
+    public Objective getObjective(String name) {
+        return scoreboard.getObjective(name);
     }
 }

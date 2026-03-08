@@ -77,7 +77,6 @@ public class TeamInventory implements InventoryHolder {
     public @NotNull Inventory getInventory() {
         return inventory;
     }
-
     public static boolean isTeamInventory(Inventory inventory) {
         return inventory.getHolder() instanceof TeamInventory;
     }

@@ -2,6 +2,7 @@ package fr.Nosta.ChillUHC.Managers;
 
 import fr.Nosta.ChillUHC.Inventories.InvSeeInventory;
 import fr.Nosta.ChillUHC.Inventories.TeamInventory;
+import fr.Nosta.ChillUHC.Inventories.TierInventory;
 import fr.Nosta.ChillUHC.Main;
 import org.bukkit.entity.Player;
 
@@ -18,7 +19,10 @@ public class InventoryManager {
     }
 
     public void openTeamInventory(Player player) {
-        TeamInventory inventory = new TeamInventory(plugin.getTeamManager());
-        inventory.open(player);
+        new TeamInventory(plugin.getTeamManager()).open(player);
+    }
+
+    public void openTierInventory(Player player) {
+        new TierInventory(plugin).open(player);
     }
 }

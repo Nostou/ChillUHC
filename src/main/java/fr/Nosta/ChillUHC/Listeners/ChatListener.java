@@ -23,8 +23,8 @@ public class ChatListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
-        Team team = plugin.getTeamManager().getTeam(player);
-        Component message = Component.text(player.getName(), team.color())
+        NamedTextColor playerColor = plugin.getTeamManager().getColor(player);
+        Component message = Component.text(player.getName(), playerColor)
                 .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
                 .append(event.message().color(NamedTextColor.WHITE));
 

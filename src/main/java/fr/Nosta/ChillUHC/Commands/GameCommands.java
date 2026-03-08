@@ -6,6 +6,7 @@ import fr.Nosta.ChillUHC.Managers.GameManager;
 import fr.Nosta.ChillUHC.Managers.InventoryManager;
 import fr.Nosta.ChillUHC.Managers.BorderManager;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
@@ -46,8 +47,14 @@ public class GameCommands implements CommandExecutor {
                 return;
             }
 
+            /*if (plugin.getTierManager().hasUndefinedPlayers()) {
+                CustomMessage.error(player, "Some players have an undefined tier");
+                return;
+            }*/
+
             gm.startGame();
         }
+
         else if (args[0].equalsIgnoreCase("stop")) {
             if (gm.getState() == GameState.WAITING) {
                 CustomMessage.error(player, "No game is currently running.");
@@ -87,6 +94,10 @@ public class GameCommands implements CommandExecutor {
 
             CustomMessage.success(player, "WorldBorder has been updated !");
         }
+
+        else if (args[0].equalsIgnoreCase("tier")) {
+            plugin.getInventoryManager().openTierInventory(player);
+        }
     }
 
     private void HandleNonOpCommands(Player player, String[] args) {
@@ -119,6 +130,9 @@ public class GameCommands implements CommandExecutor {
             }
 
             im.openTeamInventory(player);
+        }
+        else if (args[0].equalsIgnoreCase("tiersee")) {
+            CustomMessage.custom(player, NamedTextColor.YELLOW, plugin.getTierManager().logTierList());
         }
     }
 }
