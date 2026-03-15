@@ -3,6 +3,9 @@ package fr.Nosta.ChillUHC;
 import fr.Nosta.ChillUHC.Commands.*;
 import fr.Nosta.ChillUHC.Listeners.*;
 import fr.Nosta.ChillUHC.Managers.*;
+import fr.Nosta.ChillUHC.Scenarios.CutCleanScenario;
+import fr.Nosta.ChillUHC.Scenarios.HasteyBoysScenario;
+import fr.Nosta.ChillUHC.Scenarios.TimberScenario;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -68,6 +71,10 @@ public final class Main extends JavaPlugin
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new PvPListener(this), this);
+
+        getServer().getPluginManager().registerEvents(new CutCleanScenario(this), this);
+        getServer().getPluginManager().registerEvents(new HasteyBoysScenario(this), this);
+        getServer().getPluginManager().registerEvents(new TimberScenario(this), this);
     }
 
     private boolean registerCommands() {

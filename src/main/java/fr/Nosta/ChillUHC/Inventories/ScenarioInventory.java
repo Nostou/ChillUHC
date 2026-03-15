@@ -15,18 +15,24 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class ScenarioInventory implements InventoryHolder {
 
     private static final Component TITLE = Component.text("Scenarios", NamedTextColor.DARK_GRAY);
-    private static final int INVENTORY_SIZE = 27;
+    private static final int INVENTORY_SIZE = 9;
 
     private final Main plugin;
     private final Inventory inventory;
+    private final List<ScenarioType> orderedScenarios;
 
     public ScenarioInventory(Main plugin) {
         this.plugin = plugin;
+        this.orderedScenarios = Arrays.stream(ScenarioType.values())
+                .sorted(Comparator.comparing(ScenarioType::getDisplayName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
         this.inventory = Bukkit.createInventory(this, INVENTORY_SIZE, TITLE);
         initialize();
     }
@@ -34,8 +40,8 @@ public class ScenarioInventory implements InventoryHolder {
     private void initialize() {
         inventory.clear();
 
-        int slot = 10;
-        for (ScenarioType scenario : ScenarioType.values()) {
+        int slot = 0;
+        for (ScenarioType scenario : orderedScenarios) {
             inventory.setItem(slot++, createScenarioItem(scenario));
         }
     }
@@ -70,14 +76,11 @@ public class ScenarioInventory implements InventoryHolder {
     }
 
     public ScenarioType getScenario(int slot) {
-        int index = slot - 10;
-        ScenarioType[] scenarios = ScenarioType.values();
-
-        if (index < 0 || index >= scenarios.length) {
+        if (slot < 0 || slot >= orderedScenarios.size()) {
             return null;
         }
 
-        return scenarios[index];
+        return orderedScenarios.get(slot);
     }
 
     @Override
