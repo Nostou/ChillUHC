@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 public class InventoryManager {
 
     private final Main plugin;
+    private TeamInventory teamInventory;
+    private TierInventory tierInventory;
 
     public InventoryManager(Main plugin) {
         this.plugin = plugin;
@@ -19,10 +21,34 @@ public class InventoryManager {
     }
 
     public void openTeamInventory(Player player) {
-        new TeamInventory(plugin.getTeamManager()).open(player);
+        ensureInventoriesCreated();
+        refreshTeamInventory();
+        teamInventory.open(player);
     }
 
     public void openTierInventory(Player player) {
-        new TierInventory(plugin).open(player);
+        ensureInventoriesCreated();
+        refreshTierInventory();
+        tierInventory.open(player);
+    }
+
+    public void refreshTeamInventory() {
+        ensureInventoriesCreated();
+        teamInventory.update();
+    }
+
+    public void refreshTierInventory() {
+        ensureInventoriesCreated();
+        tierInventory.update();
+    }
+
+    private void ensureInventoriesCreated() {
+        if (teamInventory == null) {
+            teamInventory = new TeamInventory(plugin.getTeamManager());
+        }
+
+        if (tierInventory == null) {
+            tierInventory = new TierInventory(plugin);
+        }
     }
 }

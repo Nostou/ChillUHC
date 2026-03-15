@@ -4,6 +4,7 @@ import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -39,6 +40,8 @@ public class ConnexionListener implements Listener {
                 .append(Component.text(player.getName(), NamedTextColor.WHITE));
 
         event.joinMessage(message);
+        plugin.getInventoryManager().refreshTeamInventory();
+        plugin.getInventoryManager().refreshTierInventory();
     }
 
     @EventHandler
@@ -51,5 +54,9 @@ public class ConnexionListener implements Listener {
                 .append(Component.text(player.getName(), NamedTextColor.WHITE));
 
         event.quitMessage(message);
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            plugin.getInventoryManager().refreshTeamInventory();
+            plugin.getInventoryManager().refreshTierInventory();
+        });
     }
 }

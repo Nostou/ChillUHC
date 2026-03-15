@@ -32,6 +32,7 @@ public class TeamInventory implements InventoryHolder {
     }
 
     private void initialize() {
+        inventory.clear();
         inventory.setItem(0, createTeamItem("Blue", Material.BLUE_WOOL));
         inventory.setItem(1, createTeamItem("Cyan", Material.LIGHT_BLUE_WOOL));
         inventory.setItem(2, createTeamItem("Green", Material.GREEN_WOOL));
@@ -67,6 +68,10 @@ public class TeamInventory implements InventoryHolder {
         meta.displayName(Component.text("Leave Team", NamedTextColor.RED, TextDecoration.BOLD));
         item.setItemMeta(meta);
         return item;
+    }
+
+    public void update() {
+        initialize();
     }
 
     public void open(Player player) {

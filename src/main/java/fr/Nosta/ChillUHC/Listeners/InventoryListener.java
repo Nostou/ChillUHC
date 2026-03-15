@@ -49,11 +49,13 @@ public class InventoryListener implements Listener {
             TeamManager tm = plugin.getTeamManager();
             if (clickedItem.getType() == Material.BARRIER) {
                 tm.setPlayerTeam(player, null);
+                plugin.getInventoryManager().refreshTeamInventory();
                 player.closeInventory();
                 return;
             }
 
             tm.setPlayerTeam(player, getDisplayName(clickedItem));
+            plugin.getInventoryManager().refreshTeamInventory();
             player.closeInventory();
             return;
         }
@@ -72,7 +74,7 @@ public class InventoryListener implements Listener {
 
             if (event.isLeftClick()) tierManager.increaseTier(target);
             if (event.isRightClick()) tierManager.decreaseTier(target);
-            if (holder instanceof TierInventory inv) inv.update();
+            plugin.getInventoryManager().refreshTierInventory();
         }
     }
 
