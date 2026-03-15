@@ -2,7 +2,6 @@ package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Main;
-import fr.Nosta.ChillUHC.Managers.GameManager;
 import fr.Nosta.ChillUHC.Utils.Broadcaster;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import org.bukkit.GameMode;

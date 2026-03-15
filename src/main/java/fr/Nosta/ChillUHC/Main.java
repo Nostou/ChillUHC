@@ -6,6 +6,7 @@ import fr.Nosta.ChillUHC.Managers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
@@ -19,10 +20,19 @@ public final class Main extends JavaPlugin
     @Override
     public void onEnable() {
         world = Bukkit.getWorld("world");
+        if (world == null) {
+            getLogger().severe("Unable to find world 'world'. Plugin will be disabled.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         registerManagers();
         registerListeners();
-        registerCommands();
+        if (!registerCommands()) {
+            getLogger().severe("Unable to register command 'hf'. Plugin will be disabled.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
 
         //Wait for other plugins to load such as UHC_GENERATION (one tick)
         Bukkit.getScheduler().runTask(this, () -> {
@@ -58,9 +68,13 @@ public final class Main extends JavaPlugin
         getServer().getPluginManager().registerEvents(new PvPListener(this), this);
     }
 
-    private void registerCommands() {
-        this.getCommand("hf").setExecutor(new GameCommands(this));
-        this.getCommand("hf").setTabCompleter(new CommandCompleter(this));
+    private boolean registerCommands() {
+        PluginCommand hfCommand = getCommand("hf");
+        if (hfCommand == null) return false;
+
+        hfCommand.setExecutor(new GameCommands(this));
+        hfCommand.setTabCompleter(new CommandCompleter());
+        return true;
     }
 
     public <T> T getManager(Class<T> c)

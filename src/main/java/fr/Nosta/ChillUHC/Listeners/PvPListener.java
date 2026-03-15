@@ -1,7 +1,6 @@
 package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Main;
-import fr.Nosta.ChillUHC.Managers.TeamManager;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -16,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
-import org.bukkit.scoreboard.Team;
 
 import java.util.Set;
 

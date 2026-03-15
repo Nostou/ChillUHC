@@ -1,6 +1,4 @@
 package fr.Nosta.ChillUHC.Commands;
-
-import fr.Nosta.ChillUHC.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
@@ -13,66 +11,71 @@ import java.util.List;
 
 public class CommandCompleter implements TabCompleter {
 
-    private final Main plugin;
-
-    public CommandCompleter(Main plugin) {
-        this.plugin = plugin;
-    }
-
-    private List<String> result = new ArrayList<String>();
-
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
-        result.clear();
-        Player player = (Player)sender;
+        List<String> result = new ArrayList<>();
+        if (!(sender instanceof Player player)) return result;
+        if (!cmd.getName().equalsIgnoreCase("hf")) return result;
 
-        if (!label.equalsIgnoreCase("hf")) return result;
-
-        if (player.isOp()) HandleOpCommands(player, args);
-        HandleNonOpCommands(player, args);
+        String subCommand = args.length > 0 ? args[0].toLowerCase() : "";
+        if (player.isOp()) handleOpCommands(subCommand, args, result);
+        handleNonOpCommands(player, subCommand, args, result);
 
         return result;
     }
 
-    private void HandleOpCommands(Player player, String[] args) {
-
-        if (args.length == 1) {
-            if ("start".startsWith(args[0].toLowerCase())) result.add("start");
-            if ("stop".startsWith(args[0].toLowerCase())) result.add("stop");
-            if ("border".startsWith(args[0].toLowerCase())) result.add("border");
-            if ("tier".startsWith(args[0].toLowerCase())) result.add("tier");
-        }
-
-        else if (args.length == 2 && args[0].equalsIgnoreCase("border")) {
-            result.add("<startRadius>");
-        }
-
-        else if (args.length == 3 && args[0].equalsIgnoreCase("border")) {
-            result.add("[targetRadius]");
-        }
-
-        else if (args.length == 4 && args[0].equalsIgnoreCase("border")) {
-            result.add("[meetupDuration]");
-        }
-
-        else if (args.length == 5 && args[0].equalsIgnoreCase("border")) {
-            result.add("[shrinkDuration]");
+    private void handleOpCommands(String subCommand, String[] args, List<String> result) {
+        switch (args.length) {
+            case 1 -> {
+                addSuggestion(result, subCommand, "start");
+                addSuggestion(result, subCommand, "stop");
+                addSuggestion(result, subCommand, "border");
+                addSuggestion(result, subCommand, "tier");
+            }
+            case 2 -> {
+                if (subCommand.equals("border")) {
+                    result.add("<startRadius>");
+                }
+            }
+            case 3 -> {
+                if (subCommand.equals("border")) {
+                    result.add("[targetRadius]");
+                }
+            }
+            case 4 -> {
+                if (subCommand.equals("border")) {
+                    result.add("[meetupDuration]");
+                }
+            }
+            case 5 -> {
+                if (subCommand.equals("border")) {
+                    result.add("[shrinkDuration]");
+                }
+            }
         }
     }
 
-    private void HandleNonOpCommands(Player player, String[] args) {
-
-        if (args.length == 1) {
-            if ("invsee".startsWith(args[0].toLowerCase())) result.add("invsee");
-            if ("team".startsWith(args[0].toLowerCase())) result.add("team");
-            if ("tiersee".startsWith(args[0].toLowerCase())) result.add("tiersee");
-        }
-
-        else if (args.length == 2 && args[0].equalsIgnoreCase("invsee")) {
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getGameMode() != GameMode.SPECTATOR || p == player) continue;
-                result.add(p.getName());
+    private void handleNonOpCommands(Player player, String subCommand, String[] args, List<String> result) {
+        switch (args.length) {
+            case 1 -> {
+                addSuggestion(result, subCommand, "invsee");
+                addSuggestion(result, subCommand, "team");
+                addSuggestion(result, subCommand, "tiersee");
             }
+            case 2 -> {
+                if (subCommand.equals("invsee")) {
+                    for (Player p : Bukkit.getOnlinePlayers()) {
+                        if (p.getGameMode() != GameMode.SPECTATOR || p == player) continue;
+                        result.add(p.getName());
+                    }
+                }
+            }
+        }
+    }
+
+    private void addSuggestion(List<String> result, String input, String suggestion) {
+        if (suggestion.startsWith(input)) {
+            result.add(suggestion);
         }
     }
 }

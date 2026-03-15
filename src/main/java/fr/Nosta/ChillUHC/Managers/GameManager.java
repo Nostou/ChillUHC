@@ -16,6 +16,17 @@ import java.util.List;
 
 public class GameManager {
 
+    private static final int START_HEALTH = 20;
+    private static final int START_FOOD_LEVEL = 20;
+    private static final float START_SATURATION = 20f;
+    private static final int START_BOOK_AMOUNT = 1;
+    private static final int START_FOOD_AMOUNT = 10;
+    private static final int RESISTANCE_DURATION_TICKS = 30 * 20;
+    private static final int RESISTANCE_AMPLIFIER = 4;
+    private static final int ABSORPTION_DURATION_TICKS = 1200 * 20;
+    private static final int ABSORPTION_AMPLIFIER = 4;
+    private static final long RESET_WORLD_TIME = 1000L;
+
     private final Main plugin;
 
     private GameState currentState = GameState.WAITING;
@@ -59,7 +70,7 @@ public class GameManager {
         currentState = GameState.STARTING;
         startTask = new StartGameTask(plugin);
         startTask.start();
-        startTask.OnCompleted.addListener((runnable) -> onGameStart());
+        startTask.onCompleted.addListener((runnable) -> onGameStart());
     }
 
     public void onGameStart() {
@@ -72,19 +83,19 @@ public class GameManager {
         world.setGameRule(GameRules.PVP, true);
         world.setGameRule(GameRules.ADVANCE_TIME, true);
 
-        ItemStack book = new ItemStack(Material.BOOK, 1);
-        ItemStack food = new ItemStack(Material.COOKED_BEEF, 10);
+        ItemStack book = new ItemStack(Material.BOOK, START_BOOK_AMOUNT);
+        ItemStack food = new ItemStack(Material.COOKED_BEEF, START_FOOD_AMOUNT);
         List<ItemStack> starterItems = Arrays.asList(book, food);
 
         List<PotionEffect> starterEffects = Arrays.asList(
-                new PotionEffect(PotionEffectType.RESISTANCE, 30 * 20, 4, false, false),
-                new PotionEffect(PotionEffectType.ABSORPTION, 1200 * 20, 4, false, false)
+                new PotionEffect(PotionEffectType.RESISTANCE, RESISTANCE_DURATION_TICKS, RESISTANCE_AMPLIFIER, false, false),
+                new PotionEffect(PotionEffectType.ABSORPTION, ABSORPTION_DURATION_TICKS, ABSORPTION_AMPLIFIER, false, false)
         );
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.give(starterItems);
-            player.setHealth(20);
-            player.setFoodLevel(20);
-            player.setSaturation(20f);
+            player.setHealth(START_HEALTH);
+            player.setFoodLevel(START_FOOD_LEVEL);
+            player.setSaturation(START_SATURATION);
             player.setGameMode(GameMode.SURVIVAL);
             player.addPotionEffects(starterEffects);
         }
@@ -117,6 +128,6 @@ public class GameManager {
         world.setDifficulty(Difficulty.PEACEFUL);
         world.setGameRule(GameRules.PVP, false);
         world.setGameRule(GameRules.ADVANCE_TIME, false);
-        world.setTime(1000);
+        world.setTime(RESET_WORLD_TIME);
     }
 }

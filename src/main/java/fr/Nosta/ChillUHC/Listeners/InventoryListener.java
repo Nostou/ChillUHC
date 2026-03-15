@@ -18,7 +18,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.scoreboard.Team;
 
 public class InventoryListener implements Listener {
 
@@ -80,7 +79,9 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         Inventory topInv = event.getView().getTopInventory();
-        if (InvSeeInventory.isInvSeeInventory(topInv)) {
+        if (InvSeeInventory.isInvSeeInventory(topInv)
+                || TeamInventory.isTeamInventory(topInv)
+                || TierInventory.isTierInventory(topInv)) {
             event.setCancelled(true);
         }
     }

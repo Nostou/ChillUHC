@@ -8,7 +8,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class WorldBorderTask extends BukkitRunnable {
 
-    public final SimpleEvent<Runnable> OnCompleted = new SimpleEvent<>();
+    public final SimpleEvent<Runnable> onCompleted = new SimpleEvent<>();
 
     private final Main plugin;
 
@@ -27,7 +27,7 @@ public class WorldBorderTask extends BukkitRunnable {
     public void run() {
         if (remainingSeconds <= 0) {
             CustomMessage.infoAll("WorldBorder is now shrinking!");
-            OnCompleted.invoke(this);
+            onCompleted.invoke(this);
 
             cancel();
             return;

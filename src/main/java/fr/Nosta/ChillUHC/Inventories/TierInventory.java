@@ -2,7 +2,6 @@ package fr.Nosta.ChillUHC.Inventories;
 
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Managers.TierManager;
-import fr.Nosta.ChillUHC.Utils.TeamUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

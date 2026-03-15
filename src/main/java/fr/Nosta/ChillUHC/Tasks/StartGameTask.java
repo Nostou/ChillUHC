@@ -16,7 +16,7 @@ import java.util.List;
 
 public class StartGameTask extends BukkitRunnable {
 
-    public final SimpleEvent<Runnable> OnCompleted = new SimpleEvent<>();
+    public final SimpleEvent<Runnable> onCompleted = new SimpleEvent<>();
 
     private final Main plugin;
 
@@ -100,7 +100,7 @@ public class StartGameTask extends BukkitRunnable {
         Broadcaster.soundAll(Sound.ENTITY_ENDER_DRAGON_GROWL, 1, 1);
         Broadcaster.titleAll("START!", NamedTextColor.RED, 0, 1000, 1000);
 
-        OnCompleted.invoke(this);
+        onCompleted.invoke(this);
         cancel();
     }
 }

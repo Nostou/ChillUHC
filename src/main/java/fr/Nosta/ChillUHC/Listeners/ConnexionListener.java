@@ -2,8 +2,6 @@ package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Main;
-import fr.Nosta.ChillUHC.Managers.GameManager;
-import fr.Nosta.ChillUHC.Managers.TeamManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;

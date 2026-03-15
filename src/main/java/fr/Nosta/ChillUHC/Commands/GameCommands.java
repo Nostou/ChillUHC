@@ -14,8 +14,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import javax.swing.border.Border;
-
 public class GameCommands implements CommandExecutor {
 
     private final Main plugin;
@@ -26,113 +24,130 @@ public class GameCommands implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String s, String[] args) {
-
-        //Return if console
         if (!(sender instanceof Player player)) return true;
-        if (!s.equalsIgnoreCase("hf") || args.length == 0) return true;
+        if (!cmd.getName().equalsIgnoreCase("hf") || args.length == 0) return true;
 
-        if (player.isOp()) HandleOpCommands(player, args);
-        HandleNonOpCommands(player, args);
+        String subCommand = args[0].toLowerCase();
+        if (player.isOp() && handleOpCommands(player, subCommand, args)) {
+            return true;
+        }
+
+        handleNonOpCommands(player, subCommand, args);
 
         return true;
     }
 
-    private void HandleOpCommands(Player player, String[] args) {
+    private boolean handleOpCommands(Player player, String subCommand, String[] args) {
         BorderManager bm = plugin.getBorderManager();
         GameManager gm = plugin.getGameManager();
 
-        if (args[0].equalsIgnoreCase("start")) {
-            if (gm.getState() != GameState.WAITING) {
-                CustomMessage.error(player, "A game is already in progress.");
-                return;
+        switch (subCommand) {
+            case "start" -> {
+                if (gm.getState() != GameState.WAITING) {
+                    CustomMessage.error(player, "A game is already in progress.");
+                    return true;
+                }
+
+                /*if (plugin.getTierManager().hasUndefinedPlayers()) {
+                    CustomMessage.error(player, "Some players have an undefined tier");
+                    return true;
+                }*/
+
+                gm.startGame();
+                return true;
             }
+            case "stop" -> {
+                if (gm.getState() == GameState.WAITING) {
+                    CustomMessage.error(player, "No game is currently running.");
+                    return true;
+                }
 
-            /*if (plugin.getTierManager().hasUndefinedPlayers()) {
-                CustomMessage.error(player, "Some players have an undefined tier");
-                return;
-            }*/
-
-            gm.startGame();
-        }
-
-        else if (args[0].equalsIgnoreCase("stop")) {
-            if (gm.getState() == GameState.WAITING) {
-                CustomMessage.error(player, "No game is currently running.");
-                return;
+                gm.stopGame();
+                return true;
             }
-
-            gm.stopGame();
-        }
-
-        else if (args[0].equalsIgnoreCase("border")) {
-            if (args.length < 2) {
-                CustomMessage.error(player, "/hf border <startRadius> [targetRadius] [meetupDuration] [shrinkDuration]");
-                return;
+            case "border" -> {
+                handleBorderCommand(player, bm, args);
+                return true;
             }
-
-            int startRadius = Integer.parseInt(args[1]);
-            if (startRadius <= 0) startRadius = 1;
-            bm.setStartRadius(startRadius);
-
-            if (args.length > 2) {
-                int targetRadius = Integer.parseInt(args[2]);
-                if (targetRadius <= 0) targetRadius = 1;
-                bm.setTargetRadius(targetRadius);
+            case "tier" -> {
+                plugin.getInventoryManager().openTierInventory(player);
+                return true;
             }
-
-            if (args.length > 3) {
-                double meetupMinutes = Double.parseDouble(args[3]);
-                if (meetupMinutes <= 0) meetupMinutes = 1.0 / 60.0;
-                bm.setMeetupDuration((long)(meetupMinutes*60));
+            default -> {
+                return false;
             }
-
-            if (args.length > 4) {
-                double shrinkMinutes = Double.parseDouble(args[3]);
-                if (shrinkMinutes <= 0) shrinkMinutes = 1.0 / 60.0;
-                bm.setShrinkDuration((long)(shrinkMinutes*60));
-            }
-
-            CustomMessage.success(player, "WorldBorder has been updated !");
-        }
-
-        else if (args[0].equalsIgnoreCase("tier")) {
-            plugin.getInventoryManager().openTierInventory(player);
         }
     }
 
-    private void HandleNonOpCommands(Player player, String[] args) {
+    private void handleNonOpCommands(Player player, String subCommand, String[] args) {
         GameManager gm = plugin.getGameManager();
         InventoryManager im = plugin.getInventoryManager();
 
-        if (args[0].equalsIgnoreCase("invsee")) {
-            if (!player.isOp() && (player.getGameMode() != GameMode.SPECTATOR || plugin.getGameManager().getState() != GameState.PLAYING)) {
-                CustomMessage.error(player, "You don't have permission to use this command.");
-                return;
-            }
+        switch (subCommand) {
+            case "invsee" -> {
+                if (!player.isOp() && (player.getGameMode() != GameMode.SPECTATOR || plugin.getGameManager().getState() != GameState.PLAYING)) {
+                    CustomMessage.error(player, "You don't have permission to use this command.");
+                    return;
+                }
 
-            if (args.length < 2) {
-                CustomMessage.error(player, "/hf invsee <player>");
-                return;
-            }
+                if (args.length < 2) {
+                    CustomMessage.error(player, "/hf invsee <player>");
+                    return;
+                }
 
-            Player target = Bukkit.getPlayer(args[1]);
-            if (target == null || target.getGameMode() != GameMode.SURVIVAL || player == target) {
-                CustomMessage.error(player, "Player either not found nor valid.");
-                return;
-            }
+                Player target = Bukkit.getPlayer(args[1]);
+                if (target == null || target.getGameMode() != GameMode.SURVIVAL || player == target) {
+                    CustomMessage.error(player, "Player either not found nor valid.");
+                    return;
+                }
 
-            im.openInvSeeInventory(player, target);
+                im.openInvSeeInventory(player, target);
+            }
+            case "team" -> {
+                if (gm.getState() != GameState.WAITING) {
+                    CustomMessage.error(player, "Team selection is not available.");
+                    return;
+                }
+
+                im.openTeamInventory(player);
+            }
+            case "tiersee" -> CustomMessage.custom(player, NamedTextColor.YELLOW, plugin.getTierManager().logTierList());
         }
-        else if (args[0].equalsIgnoreCase("team")) {
-            if (gm.getState() != GameState.WAITING) {
-                CustomMessage.error(player, "Team selection is not available.");
-                return;
+    }
+
+    private void handleBorderCommand(Player player, BorderManager borderManager, String[] args) {
+        if (args.length < 2) {
+            CustomMessage.error(player, "/hf border <startRadius> [targetRadius] [meetupDuration] [shrinkDuration]");
+            return;
+        }
+
+        try {
+            borderManager.setStartRadius(parsePositiveInt(args[1]));
+
+            if (args.length > 2) {
+                borderManager.setTargetRadius(parsePositiveInt(args[2]));
             }
 
-            im.openTeamInventory(player);
+            if (args.length > 3) {
+                borderManager.setMeetupDuration(parsePositiveMinutes(args[3]));
+            }
+
+            if (args.length > 4) {
+                borderManager.setShrinkDuration(parsePositiveMinutes(args[4]));
+            }
+
+            CustomMessage.success(player, "WorldBorder has been updated !");
+        } catch (NumberFormatException exception) {
+            CustomMessage.error(player, "Border values must be valid numbers.");
         }
-        else if (args[0].equalsIgnoreCase("tiersee")) {
-            CustomMessage.custom(player, NamedTextColor.YELLOW, plugin.getTierManager().logTierList());
-        }
+    }
+
+    private int parsePositiveInt(String value) {
+        return Math.max(1, Integer.parseInt(value));
+    }
+
+    private long parsePositiveMinutes(String value) {
+        double minutes = Math.max(1.0 / 60.0, Double.parseDouble(value));
+        return (long) (minutes * 60);
     }
 }
