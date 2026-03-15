@@ -73,6 +73,10 @@ public class GameCommands implements CommandExecutor {
                 plugin.getInventoryManager().openTierInventory(player);
                 return true;
             }
+            case "scenarios" -> {
+                plugin.getInventoryManager().openScenarioInventory(player);
+                return true;
+            }
             default -> {
                 return false;
             }

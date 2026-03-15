@@ -31,6 +31,7 @@ public class CommandCompleter implements TabCompleter {
                 addSuggestion(result, subCommand, "stop");
                 addSuggestion(result, subCommand, "border");
                 addSuggestion(result, subCommand, "tier");
+                addSuggestion(result, subCommand, "scenarios");
             }
             case 2 -> {
                 if (subCommand.equals("border")) {

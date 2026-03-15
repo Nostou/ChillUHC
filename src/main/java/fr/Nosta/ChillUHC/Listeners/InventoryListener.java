@@ -1,9 +1,13 @@
 package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Inventories.InvSeeInventory;
+import fr.Nosta.ChillUHC.Inventories.ScenarioInventory;
 import fr.Nosta.ChillUHC.Inventories.TeamInventory;
 import fr.Nosta.ChillUHC.Inventories.TierInventory;
+import fr.Nosta.ChillUHC.Enums.GameState;
+import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import fr.Nosta.ChillUHC.Managers.TeamManager;
 import fr.Nosta.ChillUHC.Managers.TierManager;
 import net.kyori.adventure.text.Component;
@@ -60,6 +64,25 @@ public class InventoryListener implements Listener {
             return;
         }
 
+        if (ScenarioInventory.isScenarioInventory(topInv)) {
+            event.setCancelled(true);
+
+            if (plugin.getGameManager().getState() != GameState.WAITING) {
+                CustomMessage.error(player, "Scenarios can only be changed before the game starts.");
+                return;
+            }
+
+            if (!(topInv.getHolder() instanceof ScenarioInventory scenarioInventory)) return;
+
+            ScenarioType scenario = scenarioInventory.getScenario(event.getRawSlot());
+            if (scenario == null) return;
+
+            boolean enabled = plugin.getScenarioManager().toggle(scenario);
+            plugin.getInventoryManager().refreshScenarioInventory();
+            CustomMessage.info(player, scenario.getDisplayName() + " is now " + (enabled ? "enabled." : "disabled."));
+            return;
+        }
+
         if (TierInventory.isTierInventory(topInv)) {
             event.setCancelled(true);
 
@@ -82,6 +105,7 @@ public class InventoryListener implements Listener {
     public void onInventoryDrag(InventoryDragEvent event) {
         Inventory topInv = event.getView().getTopInventory();
         if (InvSeeInventory.isInvSeeInventory(topInv)
+                || ScenarioInventory.isScenarioInventory(topInv)
                 || TeamInventory.isTeamInventory(topInv)
                 || TierInventory.isTierInventory(topInv)) {
             event.setCancelled(true);

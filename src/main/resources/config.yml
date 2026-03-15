@@ -1,0 +1,4 @@
+scenarios:
+  cutclean: false
+  timber: false
+  hastey_boys: false
