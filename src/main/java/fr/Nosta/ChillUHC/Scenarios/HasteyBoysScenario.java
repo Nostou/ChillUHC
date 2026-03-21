@@ -11,8 +11,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class HasteyBoysScenario implements Scenario, Listener {
 
-    private static final int EFFICIENCY_LEVEL = 3;
-    private static final int UNBREAKING_LEVEL = 3;
+    private static final int EFFICIENCY_LEVEL = 2;
+    private static final int UNBREAKING_LEVEL = 2;
 
     private final Main plugin;
 

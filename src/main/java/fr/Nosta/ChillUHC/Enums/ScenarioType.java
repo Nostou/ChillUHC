@@ -3,6 +3,7 @@ package fr.Nosta.ChillUHC.Enums;
 import org.bukkit.Material;
 
 public enum ScenarioType {
+    BETA_ZOMBIES("beta_zombies", "Beta Zombies", Material.FEATHER),
     CUTCLEAN("cutclean", "CutClean", Material.IRON_INGOT),
     TIMBER("timber", "Timber", Material.IRON_AXE),
     HASTEY_BOYS("hastey_boys", "Hastey Boys", Material.GOLDEN_PICKAXE);
