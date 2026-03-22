@@ -41,7 +41,7 @@ public class TabManager {
 
     private Component getHeader() {
         return buildGradientText("Chill UHC")
-                .append(Component.text(" by Nosta", NamedTextColor.AQUA))
+                .append(Component.text(" by Nostaa", NamedTextColor.AQUA))
                 .append(Component.newline());
     }
 

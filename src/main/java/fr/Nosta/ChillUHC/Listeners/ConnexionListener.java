@@ -28,13 +28,8 @@ public class ConnexionListener implements Listener {
 
         if (plugin.getGameManager().getState() != GameState.PLAYING) {
             player.teleport(plugin.getSpawnLocation());
+            plugin.getGameManager().resetPlayer(player);
             player.setGameMode(GameMode.ADVENTURE);
-
-            AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
-            if (maxHealth != null) {
-                maxHealth.setBaseValue(20.0);
-                if (player.getHealth() > 20.0) player.setHealth(20.0);
-            }
         }
 
         AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
@@ -43,7 +38,7 @@ public class ConnexionListener implements Listener {
         Component message = Component.text("[", NamedTextColor.DARK_GRAY)
                 .append(Component.text("+", NamedTextColor.GREEN))
                 .append(Component.text("] ", NamedTextColor.DARK_GRAY))
-                .append(Component.text(player.getName(), NamedTextColor.WHITE));
+                .append(Component.text(player.getName(), plugin.getTeamManager().getColor(player)));
 
         event.joinMessage(message);
         plugin.getInventoryManager().refreshTeamInventory();
@@ -57,7 +52,7 @@ public class ConnexionListener implements Listener {
         Component message = Component.text("[", NamedTextColor.DARK_GRAY)
                 .append(Component.text("-", NamedTextColor.RED))
                 .append(Component.text("] ", NamedTextColor.DARK_GRAY))
-                .append(Component.text(player.getName(), NamedTextColor.WHITE));
+                .append(Component.text(player.getName(), plugin.getTeamManager().getColor(player)));
 
         event.quitMessage(message);
         Bukkit.getScheduler().runTask(plugin, () -> {

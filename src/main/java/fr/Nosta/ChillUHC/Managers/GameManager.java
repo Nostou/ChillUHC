@@ -86,15 +86,8 @@ public class GameManager {
                 new PotionEffect(PotionEffectType.ABSORPTION, 1200 * 20, 4, false, false)
         );
         for (Player player : Bukkit.getOnlinePlayers()) {
-            player.getInventory().clear();
+            resetPlayer(player);
             player.give(starterItems);
-            resetPlayerMaxHealth(player);
-            player.setHealth(20);
-            player.setFoodLevel(20);
-            player.setSaturation(20f);
-            player.setExp(0.0f);
-            player.setLevel(0);
-            player.setTotalExperience(0);
             player.setGameMode(GameMode.SURVIVAL);
             player.addPotionEffects(starterEffects);
         }
@@ -111,9 +104,7 @@ public class GameManager {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.teleport(plugin.getSpawnLocation());
-            player.getInventory().clear();
-            player.clearActivePotionEffects();
-            resetPlayerMaxHealth(player);
+            resetPlayer(player);
             player.setGameMode(GameMode.ADVENTURE);
         }
 
@@ -138,6 +129,18 @@ public class GameManager {
         }
 
         return Math.max(0L, (System.currentTimeMillis() - gameStartTimestamp) / 1000L);
+    }
+
+    public void resetPlayer(Player player) {
+        player.getInventory().clear();
+        player.clearActivePotionEffects();
+        resetPlayerMaxHealth(player);
+        player.setHealth(20);
+        player.setFoodLevel(20);
+        player.setSaturation(20f);
+        player.setExp(0.0f);
+        player.setLevel(0);
+        player.setTotalExperience(0);
     }
 
     private void resetPlayerMaxHealth(Player player) {
