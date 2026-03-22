@@ -35,12 +35,14 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        dropStuff(event);
+        boolean automaticRevive = plugin.getReviveManager().isAutomaticReviveActive();
+        dropStuff(event, !automaticRevive);
 
         if (plugin.getGameManager().getState() == GameState.PLAYING) {
             Player player = event.getPlayer();
-            plugin.getReviveManager().recordDeath(player);
+            plugin.getReviveManager().recordDeath(player, automaticRevive);
             player.setGameMode(GameMode.SPECTATOR);
+            if (automaticRevive) plugin.getReviveManager().scheduleAutomaticRevive(player);
         }
 
         Broadcaster.soundAll(Sound.ENTITY_WITHER_SPAWN, 1, 1);
@@ -55,12 +57,12 @@ public class DeathListener implements Listener {
         CustomMessage.error(player, "TOTEM is disabled.");
     }
 
-    private void dropStuff(PlayerDeathEvent event) {
+    private void dropStuff(PlayerDeathEvent event, boolean dropGoldenApple) {
         Player player = event.getEntity();
         Location loc = player.getLocation();
 
         List<ItemStack> drops = new ArrayList<>(event.getDrops());
-        drops.add(new ItemStack(Material.GOLDEN_APPLE, 1));
+        if (dropGoldenApple) drops.add(new ItemStack(Material.GOLDEN_APPLE, 1));
         event.getDrops().clear();
 
         for (ItemStack item : drops) {
@@ -70,17 +72,5 @@ public class DeathListener implements Listener {
             dropped.setVelocity(velocity);
             dropped.setPickupDelay(20);
         }
-    }
-
-    private String formatDrops(List<ItemStack> drops) {
-        if (drops.isEmpty()) return "[]";
-
-        List<String> parts = new ArrayList<>();
-        for (ItemStack item : drops) {
-            if (item == null || item.getType().isAir()) continue;
-            parts.add(item.getType() + "x" + item.getAmount());
-        }
-
-        return parts.toString();
     }
 }

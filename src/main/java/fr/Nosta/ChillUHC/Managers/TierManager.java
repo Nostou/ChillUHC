@@ -2,6 +2,7 @@ package fr.Nosta.ChillUHC.Managers;
 
 import fr.Nosta.ChillUHC.Main;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -48,14 +49,28 @@ public class TierManager {
 
     public Component logTierList() {
         return Component.text("= TIERS =", NamedTextColor.GREEN)
-                .append(Component.text("\n[1] » ", NamedTextColor.LIGHT_PURPLE))
+                .append(buildTierHeader(1, NamedTextColor.LIGHT_PURPLE))
                 .append(logTier(1))
-                .append(Component.text("\n[2] » ", NamedTextColor.AQUA))
+                .append(buildTierHeader(2, NamedTextColor.AQUA))
                 .append(logTier(2))
-                .append(Component.text("\n[3] » ", NamedTextColor.GOLD))
+                .append(buildTierHeader(3, NamedTextColor.GOLD))
                 .append(logTier(3))
                 .append(Component.text("\n[?] » ", NamedTextColor.GRAY))
                 .append(logTier(0));
+    }
+
+    private Component buildTierHeader(int tier, NamedTextColor color) {
+        return Component.text("\n[" + tier + "] » ", color)
+                .hoverEvent(HoverEvent.showText(getTierHoverText(tier)));
+    }
+
+    private Component getTierHoverText(int tier) {
+        return switch (tier) {
+            case 1 -> Component.text("No damage reduction", NamedTextColor.LIGHT_PURPLE);
+            case 2 -> Component.text("-10% damage taken", NamedTextColor.AQUA);
+            case 3 -> Component.text("-20% damage taken", NamedTextColor.GOLD);
+            default -> Component.text("No tier effect", NamedTextColor.GRAY);
+        };
     }
 
     private Component logTier(int value) {

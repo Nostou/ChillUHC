@@ -4,6 +4,7 @@ import org.bukkit.Material;
 
 public enum ScenarioType {
     BETA_ZOMBIES("beta_zombies", "Beta Zombies", "Instead of zombies dropping Rotten Flesh, instead they drop 0-2 feathers.", Material.FEATHER),
+    CHILL_REVIVE("chill_revive", "Chill Revive", "Automatic revives before meetup with late-game penalties.", Material.TOTEM_OF_UNDYING),
     CUTCLEAN("cutclean", "CutClean", "All ores and animal food will be dropped in it's smelted version.", Material.IRON_INGOT),
     IRONMAN("ironman", "Ironman", "Stay damage-free as long as possible to earn bonus health and golden apples.", Material.IRON_CHESTPLATE),
     TIMBER("timber", "Timber", "When you break a tree, the entire logs of that tree will come off.", Material.IRON_AXE),

@@ -191,6 +191,16 @@ public class GameCommands implements CommandExecutor {
             return;
         }
 
+        if (plugin.getScenarioManager().isEnabled(ScenarioType.CHILL_REVIVE)) {
+            CustomMessage.error(player, "This command is disabled while Chill Revive is enabled.");
+            return;
+        }
+
+        if (gameManager.getElapsedSeconds() >= plugin.getBorderManager().getMeetupDuration()) {
+            CustomMessage.error(player, "This command is disabled at meetup.");
+            return;
+        }
+
         if (args.length < 2) {
             CustomMessage.error(player, "/hf revive <player>");
             return;
@@ -203,7 +213,6 @@ public class GameCommands implements CommandExecutor {
         }
 
         CustomMessage.success(player, target.getName() + " has been revived.");
-        CustomMessage.success(target, "You have been revived.");
     }
 
     private int parsePositiveInt(String value) {
