@@ -5,7 +5,10 @@ import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Tasks.CompassTask;
 import fr.Nosta.ChillUHC.Tasks.StartGameTask;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
+import fr.Nosta.ChillUHC.Utils.SimpleEvent;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -16,24 +19,16 @@ import java.util.List;
 
 public class GameManager {
 
-    private static final int START_HEALTH = 20;
-    private static final int START_FOOD_LEVEL = 20;
-    private static final float START_SATURATION = 20f;
-    private static final int START_BOOK_AMOUNT = 1;
-    private static final int START_FOOD_AMOUNT = 10;
-    private static final int RESISTANCE_DURATION_TICKS = 30 * 20;
-    private static final int RESISTANCE_AMPLIFIER = 4;
-    private static final int ABSORPTION_DURATION_TICKS = 1200 * 20;
-    private static final int ABSORPTION_AMPLIFIER = 4;
-    private static final long RESET_WORLD_TIME = 1000L;
-
     private final Main plugin;
+    public final SimpleEvent<Runnable> onGameStart = new SimpleEvent<>();
+    public final SimpleEvent<Runnable> onGameStop = new SimpleEvent<>();
 
     private GameState currentState = GameState.WAITING;
     public GameState getState() { return currentState; }
 
     private StartGameTask startTask;
     private CompassTask compassTask;
+    private long gameStartTimestamp;
 
     public GameManager(Main plugin) {
         this.plugin = plugin;
@@ -75,43 +70,50 @@ public class GameManager {
 
     public void onGameStart() {
         currentState = GameState.PLAYING;
-
-        plugin.getBorderManager().startShrink();
+        gameStartTimestamp = System.currentTimeMillis();
 
         World world = plugin.getWorld();
         world.setDifficulty(Difficulty.EASY);
         world.setGameRule(GameRules.PVP, true);
         world.setGameRule(GameRules.ADVANCE_TIME, true);
 
-        ItemStack book = new ItemStack(Material.BOOK, START_BOOK_AMOUNT);
-        ItemStack food = new ItemStack(Material.COOKED_BEEF, START_FOOD_AMOUNT);
+        ItemStack book = new ItemStack(Material.BOOK, 1);
+        ItemStack food = new ItemStack(Material.COOKED_BEEF, 5);
         List<ItemStack> starterItems = Arrays.asList(book, food);
 
         List<PotionEffect> starterEffects = Arrays.asList(
-                new PotionEffect(PotionEffectType.RESISTANCE, RESISTANCE_DURATION_TICKS, RESISTANCE_AMPLIFIER, false, false),
-                new PotionEffect(PotionEffectType.ABSORPTION, ABSORPTION_DURATION_TICKS, ABSORPTION_AMPLIFIER, false, false)
+                new PotionEffect(PotionEffectType.RESISTANCE, 30 * 20, 4, false, false),
+                new PotionEffect(PotionEffectType.ABSORPTION, 1200 * 20, 4, false, false)
         );
         for (Player player : Bukkit.getOnlinePlayers()) {
+            player.getInventory().clear();
             player.give(starterItems);
-            player.setHealth(START_HEALTH);
-            player.setFoodLevel(START_FOOD_LEVEL);
-            player.setSaturation(START_SATURATION);
+            resetPlayerMaxHealth(player);
+            player.setHealth(20);
+            player.setFoodLevel(20);
+            player.setSaturation(20f);
+            player.setExp(0.0f);
+            player.setLevel(0);
+            player.setTotalExperience(0);
             player.setGameMode(GameMode.SURVIVAL);
             player.addPotionEffects(starterEffects);
         }
 
         compassTask = new CompassTask(plugin);
         compassTask.start();
+        onGameStart.invoke(() -> {});
     }
 
     public void stopGame() {
         if (startTask != null) startTask.cancel();
         if (compassTask != null) compassTask.cancel();
+        onGameStop.invoke(() -> {});
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.teleport(plugin.getSpawnLocation());
             player.getInventory().clear();
             player.clearActivePotionEffects();
+            resetPlayerMaxHealth(player);
             player.setGameMode(GameMode.ADVENTURE);
         }
 
@@ -119,15 +121,32 @@ public class GameManager {
 
         CustomMessage.errorAll("Forced stop of the game by an operator.");
         currentState = GameState.WAITING;
-
-        plugin.getBorderManager().reset();
     }
 
     private void reset() {
+        gameStartTimestamp = 0L;
         World world = plugin.getWorld();
         world.setDifficulty(Difficulty.PEACEFUL);
         world.setGameRule(GameRules.PVP, false);
         world.setGameRule(GameRules.ADVANCE_TIME, false);
-        world.setTime(RESET_WORLD_TIME);
+        world.setTime(1000L);
+    }
+
+    public long getElapsedSeconds() {
+        if (currentState != GameState.PLAYING || gameStartTimestamp == 0L) {
+            return 0L;
+        }
+
+        return Math.max(0L, (System.currentTimeMillis() - gameStartTimestamp) / 1000L);
+    }
+
+    private void resetPlayerMaxHealth(Player player) {
+        AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
+        if (attribute == null) return;
+
+        attribute.setBaseValue(20.0);
+        if (player.getHealth() > 20.0) {
+            player.setHealth(20.0);
+        }
     }
 }

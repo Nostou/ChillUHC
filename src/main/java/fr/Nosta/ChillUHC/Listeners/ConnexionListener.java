@@ -29,6 +29,12 @@ public class ConnexionListener implements Listener {
         if (plugin.getGameManager().getState() != GameState.PLAYING) {
             player.teleport(plugin.getSpawnLocation());
             player.setGameMode(GameMode.ADVENTURE);
+
+            AttributeInstance maxHealth = player.getAttribute(Attribute.MAX_HEALTH);
+            if (maxHealth != null) {
+                maxHealth.setBaseValue(20.0);
+                if (player.getHealth() > 20.0) player.setHealth(20.0);
+            }
         }
 
         AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);

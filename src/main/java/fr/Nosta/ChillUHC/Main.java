@@ -6,6 +6,7 @@ import fr.Nosta.ChillUHC.Managers.*;
 import fr.Nosta.ChillUHC.Scenarios.BetaZombiesScenario;
 import fr.Nosta.ChillUHC.Scenarios.CutCleanScenario;
 import fr.Nosta.ChillUHC.Scenarios.HasteyBoysScenario;
+import fr.Nosta.ChillUHC.Scenarios.IronmanScenario;
 import fr.Nosta.ChillUHC.Scenarios.TimberScenario;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -47,9 +48,9 @@ public final class Main extends JavaPlugin
 
     private void registerManagers()
     {
-        registerManager(new BorderManager(this));
         registerManager(new CompassManager(this));
         registerManager(new GameManager(this));
+        registerManager(new BorderManager(this));
         registerManager(new InventoryManager(this));
         registerManager(new ScenarioManager(this));
         registerManager(new ScoreboardManager(this));
@@ -76,6 +77,7 @@ public final class Main extends JavaPlugin
         getServer().getPluginManager().registerEvents(new BetaZombiesScenario(this), this);
         getServer().getPluginManager().registerEvents(new CutCleanScenario(this), this);
         getServer().getPluginManager().registerEvents(new HasteyBoysScenario(this), this);
+        getServer().getPluginManager().registerEvents(new IronmanScenario(this), this);
         getServer().getPluginManager().registerEvents(new TimberScenario(this), this);
     }
 
@@ -101,7 +103,6 @@ public final class Main extends JavaPlugin
     public TabManager getTabManager() { return getManager(TabManager.class); }
     public TeamManager getTeamManager() { return getManager(TeamManager.class); }
     public TierManager getTierManager() { return getManager(TierManager.class); }
-
     public World getWorld() { return world; }
     public Location getSpawnLocation() { return world.getSpawnLocation().clone().add(0.5, 0, 0.5); }
 }

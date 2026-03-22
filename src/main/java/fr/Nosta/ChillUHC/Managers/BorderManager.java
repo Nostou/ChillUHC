@@ -42,6 +42,8 @@ public class BorderManager {
 
     public BorderManager(Main plugin) {
         this.plugin = plugin;
+        plugin.getGameManager().onGameStart.addListener((ignored) -> startShrink());
+        plugin.getGameManager().onGameStop.addListener((ignored) -> reset());
     }
 
     public void initialize() {
