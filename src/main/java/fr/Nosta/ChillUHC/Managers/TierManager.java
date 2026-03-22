@@ -65,11 +65,34 @@ public class TierManager {
     }
 
     private Component getTierHoverText(int tier) {
+        int maxDiamondArmorPieces = getMaxDiamondArmorPieces(tier);
+
         return switch (tier) {
-            case 1 -> Component.text("No damage reduction", NamedTextColor.LIGHT_PURPLE);
-            case 2 -> Component.text("-10% damage taken", NamedTextColor.AQUA);
-            case 3 -> Component.text("-20% damage taken", NamedTextColor.GOLD);
+            case 1 -> Component.text()
+                    .append(Component.text("No damage reduction", NamedTextColor.LIGHT_PURPLE))
+                    .append(Component.text("\n"+maxDiamondArmorPieces + " diamond pieces", NamedTextColor.LIGHT_PURPLE))
+                    .build();
+            case 2 -> Component.text()
+                    .append(Component.text("-10% damage taken", NamedTextColor.AQUA))
+                    .append(Component.text("\n"+maxDiamondArmorPieces + " diamond pieces", NamedTextColor.AQUA))
+                    .build();
+            case 3 -> Component.text()
+                    .append(Component.text("-20% damage taken", NamedTextColor.GOLD))
+                    .append(Component.text("\n"+maxDiamondArmorPieces + " diamond pieces", NamedTextColor.GOLD))
+                    .build();
             default -> Component.text("No tier effect", NamedTextColor.GRAY);
+        };
+    }
+
+    public int getMaxDiamondArmorPieces(Player player) {
+        return getMaxDiamondArmorPieces(getTier(player));
+    }
+
+    public int getMaxDiamondArmorPieces(int tier) {
+        return switch (tier) {
+            case 1 -> 2;
+            case 2 -> 3;
+            default -> 4;
         };
     }
 
