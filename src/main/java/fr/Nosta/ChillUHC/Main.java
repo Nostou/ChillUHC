@@ -53,6 +53,7 @@ public final class Main extends JavaPlugin
         registerManager(new BorderManager(this));
         registerManager(new InventoryManager(this));
         registerManager(new ScenarioManager(this));
+        registerManager(new ReviveManager(this));
         registerManager(new ScoreboardManager(this));
         registerManager(new TabManager(this));
         registerManager(new TeamManager(this));
@@ -98,6 +99,7 @@ public final class Main extends JavaPlugin
     public CompassManager getCompassManager() { return getManager(CompassManager.class); }
     public GameManager getGameManager() { return getManager(GameManager.class); }
     public InventoryManager getInventoryManager() { return getManager(InventoryManager.class); }
+    public ReviveManager getReviveManager() { return getManager(ReviveManager.class); }
     public ScenarioManager getScenarioManager() { return getManager(ScenarioManager.class); }
     public ScoreboardManager getScoreboardManager() { return getManager(ScoreboardManager.class); }
     public TabManager getTabManager() { return getManager(TabManager.class); }

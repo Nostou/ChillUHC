@@ -43,6 +43,7 @@ public class GameManager {
         world.setGameRule(GameRules.ALLOW_ENTERING_NETHER_USING_PORTALS, false);
         world.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0);
         world.setGameRule(GameRules.IMMEDIATE_RESPAWN, true);
+        world.setGameRule(GameRules.KEEP_INVENTORY, false);
         world.setGameRule(GameRules.LOCATOR_BAR, false);
         world.setGameRule(GameRules.NATURAL_HEALTH_REGENERATION, false);
         world.setGameRule(GameRules.SHOW_ADVANCEMENT_MESSAGES, false);

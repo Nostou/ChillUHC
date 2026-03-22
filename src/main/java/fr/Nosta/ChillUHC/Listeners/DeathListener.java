@@ -8,7 +8,6 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,18 +35,19 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
+        dropStuff(event);
+
         if (plugin.getGameManager().getState() == GameState.PLAYING) {
             Player player = event.getPlayer();
+            plugin.getReviveManager().recordDeath(player);
             player.setGameMode(GameMode.SPECTATOR);
         }
 
-        dropStuff(event);
         Broadcaster.soundAll(Sound.ENTITY_WITHER_SPAWN, 1, 1);
     }
 
     @EventHandler
     public void onTotemUse(EntityResurrectEvent event) {
-
         if (!(event.getEntity() instanceof Player player)) return;
         if (event.getHand() == null) return;
 
@@ -65,10 +65,22 @@ public class DeathListener implements Listener {
 
         for (ItemStack item : drops) {
             if (item == null || item.getType().isAir()) continue;
-            Item dropped = player.getWorld().dropItem(loc, item);
+            var dropped = player.getWorld().dropItem(loc, item);
             Vector velocity = new Vector((Math.random() - 0.5), 1, (Math.random() - 0.5)).multiply(0.25);
             dropped.setVelocity(velocity);
             dropped.setPickupDelay(20);
         }
+    }
+
+    private String formatDrops(List<ItemStack> drops) {
+        if (drops.isEmpty()) return "[]";
+
+        List<String> parts = new ArrayList<>();
+        for (ItemStack item : drops) {
+            if (item == null || item.getType().isAir()) continue;
+            parts.add(item.getType() + "x" + item.getAmount());
+        }
+
+        return parts.toString();
     }
 }

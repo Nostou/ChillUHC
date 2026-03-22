@@ -6,6 +6,7 @@ import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Managers.GameManager;
 import fr.Nosta.ChillUHC.Managers.InventoryManager;
 import fr.Nosta.ChillUHC.Managers.BorderManager;
+import fr.Nosta.ChillUHC.Managers.ReviveManager;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,6 +46,7 @@ public class GameCommands implements CommandExecutor {
     private boolean handleOpCommands(Player player, String subCommand, String[] args) {
         BorderManager bm = plugin.getBorderManager();
         GameManager gm = plugin.getGameManager();
+        ReviveManager rm = plugin.getReviveManager();
 
         switch (subCommand) {
             case "start" -> {
@@ -80,6 +82,10 @@ public class GameCommands implements CommandExecutor {
             }
             case "scenarios" -> {
                 plugin.getInventoryManager().openScenarioInventory(player);
+                return true;
+            }
+            case "revive" -> {
+                handleReviveCommand(player, gm, rm, args);
                 return true;
             }
             default -> {
@@ -177,6 +183,27 @@ public class GameCommands implements CommandExecutor {
         } catch (NumberFormatException exception) {
             CustomMessage.error(player, "Border values must be valid numbers.");
         }
+    }
+
+    private void handleReviveCommand(Player player, GameManager gameManager, ReviveManager reviveManager, String[] args) {
+        if (gameManager.getState() != GameState.PLAYING) {
+            CustomMessage.error(player, "A revive is only available while the game is running.");
+            return;
+        }
+
+        if (args.length < 2) {
+            CustomMessage.error(player, "/hf revive <player>");
+            return;
+        }
+
+        Player target = Bukkit.getPlayerExact(args[1]);
+        if (target == null || target.getGameMode() != GameMode.SPECTATOR || !reviveManager.hasDeathState(target) || !reviveManager.revive(target)) {
+            CustomMessage.error(player, "This player cannot be revived.");
+            return;
+        }
+
+        CustomMessage.success(player, target.getName() + " has been revived.");
+        CustomMessage.success(target, "You have been revived.");
     }
 
     private int parsePositiveInt(String value) {
