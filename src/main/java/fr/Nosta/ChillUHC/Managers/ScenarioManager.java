@@ -5,7 +5,9 @@ import fr.Nosta.ChillUHC.Main;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ScenarioManager {
 
@@ -49,5 +51,13 @@ public class ScenarioManager {
         boolean newValue = !isEnabled(scenario);
         setEnabled(scenario, newValue);
         return newValue;
+    }
+
+    public List<ScenarioType> getEnabledScenarios() {
+        return scenarioStates.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey)
+                .sorted((first, second) -> String.CASE_INSENSITIVE_ORDER.compare(first.getDisplayName(), second.getDisplayName()))
+                .collect(Collectors.toList());
     }
 }

@@ -11,6 +11,7 @@ import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import fr.Nosta.ChillUHC.Managers.TeamManager;
 import fr.Nosta.ChillUHC.Managers.TierManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -79,7 +80,11 @@ public class InventoryListener implements Listener {
 
             boolean enabled = plugin.getScenarioManager().toggle(scenario);
             plugin.getInventoryManager().refreshScenarioInventory();
-            CustomMessage.info(player, scenario.getDisplayName() + " is now " + (enabled ? "enabled." : "disabled."));
+
+            Component status = Component.text(enabled ? "enabled." : "disabled.", enabled ? NamedTextColor.GREEN : NamedTextColor.RED);
+            CustomMessage.custom(player, NamedTextColor.GOLD,
+                    Component.text(scenario.getDisplayName() + " is now ", NamedTextColor.YELLOW)
+                            .append(status));
             return;
         }
 

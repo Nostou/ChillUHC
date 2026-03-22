@@ -1,18 +1,23 @@
 package fr.Nosta.ChillUHC.Commands;
 
+import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Managers.GameManager;
 import fr.Nosta.ChillUHC.Managers.InventoryManager;
 import fr.Nosta.ChillUHC.Managers.BorderManager;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 public class GameCommands implements CommandExecutor {
 
@@ -115,8 +120,36 @@ public class GameCommands implements CommandExecutor {
 
                 im.openTeamInventory(player);
             }
-            case "tiersee" -> CustomMessage.custom(player, NamedTextColor.YELLOW, plugin.getTierManager().logTierList());
+            case "infos" -> CustomMessage.custom(player, NamedTextColor.YELLOW, buildInfosMessage());
         }
+    }
+
+    private Component buildInfosMessage() {
+        return plugin.getTierManager().logTierList()
+                .append(Component.text("\n\nScenarios » ", NamedTextColor.AQUA))
+                .append(buildScenarioList());
+    }
+
+    private Component buildScenarioList() {
+        List<ScenarioType> enabledScenarios = plugin.getScenarioManager().getEnabledScenarios();
+        if (enabledScenarios.isEmpty()) {
+            return Component.text("No active scenarios", NamedTextColor.GRAY);
+        }
+
+        Component result = Component.empty();
+        Component separator = Component.text("/", NamedTextColor.DARK_GRAY);
+
+        for (int i = 0; i < enabledScenarios.size(); i++) {
+            if (i > 0) {
+                result = result.append(separator);
+            }
+
+            ScenarioType scenario = enabledScenarios.get(i);
+            result = result.append(Component.text(scenario.getDisplayName(), NamedTextColor.GREEN)
+                    .hoverEvent(HoverEvent.showText(Component.text(scenario.getDescription(), NamedTextColor.GRAY))));
+        }
+
+        return result;
     }
 
     private void handleBorderCommand(Player player, BorderManager borderManager, String[] args) {

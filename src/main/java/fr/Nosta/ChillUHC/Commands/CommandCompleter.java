@@ -61,7 +61,7 @@ public class CommandCompleter implements TabCompleter {
             case 1 -> {
                 addSuggestion(result, subCommand, "invsee");
                 addSuggestion(result, subCommand, "team");
-                addSuggestion(result, subCommand, "tiersee");
+                addSuggestion(result, subCommand, "infos");
             }
             case 2 -> {
                 if (subCommand.equals("invsee")) {
