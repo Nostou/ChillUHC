@@ -2,6 +2,7 @@ package fr.Nosta.ChillUHC.Managers;
 
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Scenarios.Scenario;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.EnumMap;
@@ -15,6 +16,7 @@ public class ScenarioManager {
 
     private final Main plugin;
     private final Map<ScenarioType, Boolean> scenarioStates = new EnumMap<>(ScenarioType.class);
+    private final Map<ScenarioType, Scenario> scenarios = new EnumMap<>(ScenarioType.class);
 
     public ScenarioManager(Main plugin) {
         this.plugin = plugin;
@@ -41,10 +43,49 @@ public class ScenarioManager {
         return scenarioStates.getOrDefault(scenario, false);
     }
 
+    public void registerScenario(Scenario scenario) {
+        scenarios.put(scenario.getType(), scenario);
+    }
+
+    public Scenario getScenario(ScenarioType type) {
+        return scenarios.get(type);
+    }
+
+    public <T extends Scenario> T getScenario(ScenarioType type, Class<T> scenarioClass) {
+        Scenario scenario = scenarios.get(type);
+        if (scenario == null) {
+            return null;
+        }
+
+        return scenarioClass.cast(scenario);
+    }
+
+    public void initializeRegisteredScenarios() {
+        for (Scenario scenario : scenarios.values()) {
+            if (isEnabled(scenario.getType())) {
+                scenario.onEnable();
+            }
+        }
+    }
+
     public void setEnabled(ScenarioType scenario, boolean enabled) {
+        boolean previous = isEnabled(scenario);
+        if (previous == enabled) {
+            return;
+        }
+
         scenarioStates.put(scenario, enabled);
         plugin.getConfig().set(CONFIG_PATH + scenario.getKey(), enabled);
         plugin.saveConfig();
+
+        Scenario scenarioInstance = scenarios.get(scenario);
+        if (scenarioInstance != null) {
+            if (enabled) {
+                scenarioInstance.onEnable();
+            } else {
+                scenarioInstance.onDisable();
+            }
+        }
     }
 
     public boolean toggle(ScenarioType scenario) {

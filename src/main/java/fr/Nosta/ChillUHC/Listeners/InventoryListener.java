@@ -7,6 +7,7 @@ import fr.Nosta.ChillUHC.Inventories.TierInventory;
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Scenarios.AnonymousScenario;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import fr.Nosta.ChillUHC.Managers.TeamManager;
 import fr.Nosta.ChillUHC.Managers.TierManager;
@@ -77,6 +78,14 @@ public class InventoryListener implements Listener {
 
             ScenarioType scenario = scenarioInventory.getScenario(event.getRawSlot());
             if (scenario == null) return;
+
+            if (scenario == ScenarioType.ANONYMOUS && event.isRightClick()) {
+                AnonymousScenario anonymousScenario = plugin.getScenarioManager().getScenario(ScenarioType.ANONYMOUS, AnonymousScenario.class);
+                if (anonymousScenario != null) {
+                    anonymousScenario.openSkinEditor(player);
+                }
+                return;
+            }
 
             boolean enabled = plugin.getScenarioManager().toggle(scenario);
             plugin.getInventoryManager().refreshScenarioInventory();

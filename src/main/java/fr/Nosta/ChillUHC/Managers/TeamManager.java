@@ -2,6 +2,7 @@ package fr.Nosta.ChillUHC.Managers;
 
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
+import fr.Nosta.ChillUHC.Utils.SimpleEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -12,6 +13,8 @@ import org.bukkit.scoreboard.Team;
 import java.util.*;
 
 public class TeamManager {
+
+    public final SimpleEvent<Player> onTeamChanged = new SimpleEvent<>();
 
     private final Main plugin;
     private final Scoreboard scoreboard;
@@ -41,6 +44,7 @@ public class TeamManager {
 
         team.color(color);
         team.setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
 
         teams.put(name, team);
     }
@@ -79,6 +83,7 @@ public class TeamManager {
         }
 
         player.setScoreboard(scoreboard);
+        onTeamChanged.invoke(player);
     }
 
     public Team getTeam(String teamName) { return teams.get(teamName); }
@@ -88,5 +93,12 @@ public class TeamManager {
     public NamedTextColor getColor(Player player) {
         Team team = playerTeams.get(player.getName());
         return team != null ? (NamedTextColor)team.color() : NamedTextColor.WHITE;
+    }
+
+    public void setNameTagsVisible(boolean visible) {
+        Team.OptionStatus status = visible ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER;
+        for (Team team : teams.values()) {
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, status);
+        }
     }
 }

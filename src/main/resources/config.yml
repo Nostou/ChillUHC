@@ -1,5 +1,11 @@
 scenarios:
+  anonymous: false
   beta_zombies: false
   cutclean: false
   timber: false
   hastey_boys: false
+anonymous:
+  skin:
+    source: ""
+    texture: ""
+    signature: ""

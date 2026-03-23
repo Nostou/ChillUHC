@@ -2,6 +2,7 @@ package fr.Nosta.ChillUHC.Inventories;
 
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Scenarios.AnonymousScenario;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -59,7 +60,17 @@ public class ScenarioInventory implements InventoryHolder {
         List<Component> lore = new ArrayList<>();
         lore.add(Component.text("Status: ", NamedTextColor.DARK_GRAY)
                 .append(Component.text(statusText, statusColor)));
-        lore.add(Component.text("Click to toggle", NamedTextColor.AQUA));
+        lore.add(Component.text("Left click to toggle", NamedTextColor.AQUA));
+
+        if (scenario == ScenarioType.ANONYMOUS) {
+            AnonymousScenario anonymousScenario = plugin.getScenarioManager().getScenario(ScenarioType.ANONYMOUS, AnonymousScenario.class);
+            String source = anonymousScenario != null ? anonymousScenario.getConfiguredSkinSource() : "";
+            String skinValue = source == null || source.isBlank() ? "None" : source;
+            lore.add(Component.text("Right click to set shared skin", NamedTextColor.GOLD));
+            lore.add(Component.text("Skin: ", NamedTextColor.DARK_GRAY)
+                    .append(Component.text(skinValue, NamedTextColor.WHITE)));
+        }
+
         meta.lore(lore);
 
         item.setItemMeta(meta);

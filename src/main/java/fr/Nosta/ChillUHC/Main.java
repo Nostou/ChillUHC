@@ -8,6 +8,7 @@ import fr.Nosta.ChillUHC.Scenarios.ChillReviveScenario;
 import fr.Nosta.ChillUHC.Scenarios.CutCleanScenario;
 import fr.Nosta.ChillUHC.Scenarios.HasteyBoysScenario;
 import fr.Nosta.ChillUHC.Scenarios.IronmanScenario;
+import fr.Nosta.ChillUHC.Scenarios.AnonymousScenario;
 import fr.Nosta.ChillUHC.Scenarios.TimberScenario;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -44,6 +45,7 @@ public final class Main extends JavaPlugin
         //Wait for other plugins to load such as UHC_GENERATION (one tick)
         Bukkit.getScheduler().runTask(this, () -> {
             getManager(GameManager.class).initGame();
+            getScenarioManager().initializeRegisteredScenarios();
         });
     }
 
@@ -77,12 +79,20 @@ public final class Main extends JavaPlugin
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new PvPListener(this), this);
 
-        getServer().getPluginManager().registerEvents(new BetaZombiesScenario(this), this);
-        getServer().getPluginManager().registerEvents(new ChillReviveScenario(this), this);
-        getServer().getPluginManager().registerEvents(new CutCleanScenario(this), this);
-        getServer().getPluginManager().registerEvents(new HasteyBoysScenario(this), this);
-        getServer().getPluginManager().registerEvents(new IronmanScenario(this), this);
-        getServer().getPluginManager().registerEvents(new TimberScenario(this), this);
+        registerScenarioListener(new AnonymousScenario(this));
+        registerScenarioListener(new BetaZombiesScenario(this));
+        registerScenarioListener(new ChillReviveScenario(this));
+        registerScenarioListener(new CutCleanScenario(this));
+        registerScenarioListener(new HasteyBoysScenario(this));
+        registerScenarioListener(new IronmanScenario(this));
+        registerScenarioListener(new TimberScenario(this));
+    }
+
+    private void registerScenarioListener(fr.Nosta.ChillUHC.Scenarios.Scenario scenario) {
+        getScenarioManager().registerScenario(scenario);
+        if (scenario instanceof org.bukkit.event.Listener listener) {
+            getServer().getPluginManager().registerEvents(listener, this);
+        }
     }
 
     private boolean registerCommands() {

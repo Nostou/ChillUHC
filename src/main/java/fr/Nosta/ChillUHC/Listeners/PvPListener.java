@@ -1,6 +1,7 @@
 package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,6 +21,7 @@ import java.util.Set;
 
 public class PvPListener implements Listener {
 
+    private static final String ANONYMOUS_MASK = "???";
     private static final Set<Material> DISABLED_ITEMS = Set.of(
             Material.CROSSBOW,
             Material.TRIDENT,
@@ -154,9 +156,11 @@ public class PvPListener implements Listener {
             if (target.isDead()) return;
 
             int halfHearts = (int)(target.getHealth() + target.getAbsorptionAmount())+1;
-            NamedTextColor playerColor = plugin.getTeamManager().getColor(target);
+            Component displayedName = plugin.getScenarioManager().isEnabled(ScenarioType.ANONYMOUS)
+                    ? Component.text(ANONYMOUS_MASK, plugin.getTeamManager().getColor(target))
+                    : Component.text(target.getName(), plugin.getTeamManager().getColor(target));
 
-            Component msg = Component.text(target.getName(), playerColor)
+            Component msg = displayedName
                     .append(Component.text(" is now at ", NamedTextColor.GRAY))
                     .append(getColoredHealth(halfHearts));
 
