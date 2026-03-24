@@ -35,13 +35,14 @@ public class CommandCompleter implements TabCompleter {
                 addSuggestion(result, subCommand, "revive");
             }
             case 2 -> {
-                if (subCommand.equals("border")) {
-                    result.add("<startRadius>");
-                }
-                else if (subCommand.equals("revive")) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        if (p.getGameMode() != GameMode.SPECTATOR) continue;
-                        result.add(p.getName());
+                switch (subCommand) {
+                    case "start" -> addSuggestion(result, args[1].toLowerCase(), "debug");
+                    case "border" -> result.add("<startRadius>");
+                    case "revive" -> {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            if (p.getGameMode() != GameMode.SPECTATOR) continue;
+                            result.add(p.getName());
+                        }
                     }
                 }
             }

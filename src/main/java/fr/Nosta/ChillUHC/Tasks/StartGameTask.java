@@ -19,23 +19,31 @@ public class StartGameTask extends BukkitRunnable {
     public final SimpleEvent<Runnable> onCompleted = new SimpleEvent<>();
 
     private final Main plugin;
+    private final boolean debug;
 
     private final int levitationDuration = 2;
     private final int jumpDuration = 15;
     private int tick;
 
-    public StartGameTask(Main plugin) {
+    public StartGameTask(Main plugin, boolean debug) {
         this.plugin = plugin;
+        this.debug = debug;
     }
 
     public void start() {
+        if (debug) {
+            spreadPlayers(true);
+            finish();
+            return;
+        }
+
         runTaskTimer(plugin, 0L, 20L);
     }
 
     @Override
     public void run() {
         if (tick == 0) startLevitation();
-        if (tick == levitationDuration) spreadPlayers();
+        if (tick == levitationDuration) spreadPlayers(false);
         if (tick == (levitationDuration+jumpDuration)) finish();
         tick++;
     }
@@ -49,7 +57,7 @@ public class StartGameTask extends BukkitRunnable {
         }
     }
 
-    private void spreadPlayers() {
+    private void spreadPlayers(boolean instant) {
         Location center = plugin.getSpawnLocation();
         int radius = plugin.getBorderManager().getStartRadius();
 
@@ -66,7 +74,9 @@ public class StartGameTask extends BukkitRunnable {
         if (isFFA) {
             int index = 0;
             for (Player player : Bukkit.getOnlinePlayers()) {
-                Jumper.jump(plugin, player, targetList.get(index++), 30, jumpDuration * 20);
+                Location target = targetList.get(index++);
+                if (instant) player.teleport(target);
+                else Jumper.jump(plugin, player, target, 30, jumpDuration * 20);
             }
         }
         else {
@@ -78,7 +88,13 @@ public class StartGameTask extends BukkitRunnable {
                 if (players.isEmpty()) continue;
 
                 for (Player player : players) {
-                    Jumper.jump(plugin, player, targetList.get(index), 30, jumpDuration * 20);
+                    Location target = targetList.get(index);
+                    if (instant) {
+                        player.teleport(target);
+                    }
+                    else {
+                        Jumper.jump(plugin, player, target, 30, jumpDuration * 20);
+                    }
                 }
                 index++;
             }
@@ -101,6 +117,6 @@ public class StartGameTask extends BukkitRunnable {
         Broadcaster.titleAll("START!", NamedTextColor.RED, 0, 1000, 1000);
 
         onCompleted.invoke(this);
-        cancel();
+        if (!debug) cancel();
     }
 }

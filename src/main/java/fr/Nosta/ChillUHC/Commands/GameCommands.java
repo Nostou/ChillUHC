@@ -55,12 +55,14 @@ public class GameCommands implements CommandExecutor {
                     return true;
                 }
 
-                /*if (plugin.getTierManager().hasUndefinedPlayers()) {
+                boolean isDebug = args.length > 1 && args[1].equalsIgnoreCase("debug");
+
+                if (!isDebug && plugin.getTierManager().hasUndefinedPlayers()) {
                     CustomMessage.error(player, "Some players have an undefined tier");
                     return true;
-                }*/
+                }
 
-                gm.startGame();
+                gm.startGame(isDebug);
                 return true;
             }
             case "stop" -> {

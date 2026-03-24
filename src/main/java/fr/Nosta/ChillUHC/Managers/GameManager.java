@@ -62,11 +62,11 @@ public class GameManager {
         plugin.getLogger().warning("Game initialized.");
     }
 
-    public void startGame() {
+    public void startGame(boolean isDebug) {
         currentState = GameState.STARTING;
-        startTask = new StartGameTask(plugin);
-        startTask.start();
+        startTask = new StartGameTask(plugin, isDebug);
         startTask.onCompleted.addListener((runnable) -> onGameStart());
+        startTask.start();
     }
 
     public void onGameStart() {
@@ -99,8 +99,10 @@ public class GameManager {
     }
 
     public void stopGame() {
-        if (startTask != null) startTask.cancel();
-        if (compassTask != null) compassTask.cancel();
+        cancelTask(startTask);
+        cancelTask(compassTask);
+        startTask = null;
+        compassTask = null;
         onGameStop.invoke(() -> {});
 
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -113,6 +115,12 @@ public class GameManager {
 
         CustomMessage.errorAll("Forced stop of the game by an operator.");
         currentState = GameState.WAITING;
+    }
+
+    private void cancelTask(org.bukkit.scheduler.BukkitRunnable task) {
+        if (task == null) return;
+        try { task.cancel(); }
+        catch (IllegalStateException ignored) {}
     }
 
     private void reset() {
