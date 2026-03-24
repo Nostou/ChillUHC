@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,13 +49,13 @@ public class AnonymousScenario implements Scenario, Listener {
 
     @Override
     public void onEnable() {
-        plugin.getTeamManager().setNameTagsVisible(false);
+        plugin.getTeamManager().ModifyAllTeams(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
         forEachOnlinePlayer(this::applyPlayerState);
     }
 
     @Override
     public void onDisable() {
-        plugin.getTeamManager().setNameTagsVisible(true);
+        plugin.getTeamManager().ModifyAllTeams(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.ALWAYS);
         forEachOnlinePlayer(this::applyPlayerState);
     }
 

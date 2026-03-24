@@ -35,6 +35,8 @@ public class ConnexionListener implements Listener {
         AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
         if (attackSpeed != null) attackSpeed.setBaseValue(1024.0);
 
+        plugin.getTeamManager().ensureFFAMembership(player);
+
         Component message = Component.text("[", NamedTextColor.DARK_GRAY)
                 .append(Component.text("+", NamedTextColor.GREEN))
                 .append(Component.text("] ", NamedTextColor.DARK_GRAY))
