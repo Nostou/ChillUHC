@@ -1,5 +1,5 @@
 name: ChillUHC
-version: '1.0'
+version: '1.2'
 main: fr.Nosta.ChillUHC.Main
 api-version: '1.21'
 commands:

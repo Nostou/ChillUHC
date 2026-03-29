@@ -58,7 +58,7 @@ public class GameCommands implements CommandExecutor {
                 boolean isDebug = args.length > 1 && args[1].equalsIgnoreCase("debug");
 
                 if (!isDebug && plugin.getTierManager().hasUndefinedPlayers()) {
-                    CustomMessage.error(player, "Some players have an undefined tier");
+                    CustomMessage.error(player, "Some players have an undefined tier.");
                     return true;
                 }
 
