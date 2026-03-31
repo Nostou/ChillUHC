@@ -27,7 +27,7 @@ public class BetaZombiesScenario implements Scenario, Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         if (!plugin.getScenarioManager().isEnabled(getType())) return;
-        if (event.getEntityType() != EntityType.ZOMBIE) return;
+        if (event.getEntityType() != EntityType.ZOMBIE && event.getEntityType() != EntityType.ZOMBIE_VILLAGER) return;
 
         List<ItemStack> drops = event.getDrops();
         for (int i = 0; i < drops.size(); i++) {
