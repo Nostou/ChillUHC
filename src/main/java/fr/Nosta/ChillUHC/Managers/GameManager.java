@@ -87,6 +87,9 @@ public class GameManager {
         );
         for (Player player : Bukkit.getOnlinePlayers()) {
             resetPlayer(player);
+            plugin.getTierManager().applyTierAttributes(player);
+            AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
+            if (attribute != null) player.setHealth(attribute.getBaseValue());
             player.give(starterItems);
             player.setGameMode(GameMode.SURVIVAL);
             player.addPotionEffects(starterEffects);
@@ -152,7 +155,7 @@ public class GameManager {
         player.getInventory().clear();
         player.clearActivePotionEffects();
         resetPlayerMaxHealth(player);
-        player.setHealth(20);
+        player.setHealth(20.0);
         player.setFoodLevel(20);
         player.setSaturation(20f);
         player.setExp(0.0f);

@@ -40,17 +40,7 @@ public class PlayerListener implements Listener {
     public void onDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
-        double multiplier = getTierDamageMultiplier(player);
+        double multiplier = plugin.getTierManager().getDamageMultiplier(player);
         event.setDamage(event.getDamage() * multiplier);
-    }
-
-    private double getTierDamageMultiplier(Player player) {
-        int tier = plugin.getTierManager().getTier(player);
-
-        return switch (tier) {
-            case 2 -> 0.9;
-            case 3 -> 0.8;
-            default -> 1.0;
-        };
     }
 }

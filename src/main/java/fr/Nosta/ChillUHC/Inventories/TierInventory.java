@@ -54,13 +54,13 @@ public class TierInventory implements InventoryHolder {
             int tier = tierManager.getTier(p);
             String tierString = tier == 0 ? "Undefined" : "Tier "+ tier;
             NamedTextColor finalColor = NamedTextColor.GRAY;
-            if (tier == 1) finalColor = NamedTextColor.LIGHT_PURPLE;
-            else if (tier == 2) finalColor = NamedTextColor.AQUA;
-            else if (tier == 3) finalColor = NamedTextColor.GOLD;
+            if (tier == 1) finalColor = NamedTextColor.GOLD;
+            else if (tier == 2) finalColor = NamedTextColor.LIGHT_PURPLE;
+            else if (tier == 3) finalColor = NamedTextColor.AQUA;
+            else if (tier == 4) finalColor = NamedTextColor.GREEN;
             meta.lore(List.of(Component.text(tierString, finalColor)));
 
             head.setItemMeta(meta);
-
             inventory.setItem(slot++, head);
         }
     }
