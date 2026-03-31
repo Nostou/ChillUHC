@@ -78,6 +78,10 @@ public class GameCommands implements CommandExecutor {
                 handleBorderCommand(player, bm, args);
                 return true;
             }
+            case "pvp" -> {
+                handlePvpCommand(player, gm, args);
+                return true;
+            }
             case "tier" -> {
                 plugin.getInventoryManager().openTierInventory(player);
                 return true;
@@ -185,6 +189,11 @@ public class GameCommands implements CommandExecutor {
         } catch (NumberFormatException exception) {
             CustomMessage.error(player, "Border values must be valid numbers.");
         }
+    }
+
+    private void handlePvpCommand(Player player, GameManager gameManager, String[] args) {
+        boolean pvpEnabled = Boolean.TRUE.equals(plugin.getWorld().getGameRuleValue(org.bukkit.GameRules.PVP));
+        gameManager.setPvpEnabled(!pvpEnabled);
     }
 
     private void handleReviveCommand(Player player, GameManager gameManager, ReviveManager reviveManager, String[] args) {

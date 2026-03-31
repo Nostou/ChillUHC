@@ -30,6 +30,7 @@ public class CommandCompleter implements TabCompleter {
                 addSuggestion(result, subCommand, "start");
                 addSuggestion(result, subCommand, "stop");
                 addSuggestion(result, subCommand, "border");
+                addSuggestion(result, subCommand, "pvp");
                 addSuggestion(result, subCommand, "tier");
                 addSuggestion(result, subCommand, "scenarios");
                 addSuggestion(result, subCommand, "revive");
