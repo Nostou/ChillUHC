@@ -74,8 +74,7 @@ public class GameManager {
         gameStartTimestamp = System.currentTimeMillis();
 
         World world = plugin.getWorld();
-        world.setDifficulty(Difficulty.EASY);
-        world.setGameRule(GameRules.PVP, true);
+        world.setDifficulty(Difficulty.NORMAL);
         world.setGameRule(GameRules.ADVANCE_TIME, true);
 
         ItemStack book = new ItemStack(Material.BOOK, 1);
@@ -115,6 +114,15 @@ public class GameManager {
 
         CustomMessage.errorAll("Forced stop of the game by an operator.");
         currentState = GameState.WAITING;
+    }
+
+    public void setPvpEnabled(boolean state) {
+        World world = plugin.getWorld();
+        Boolean currentState = world.getGameRuleValue(GameRules.PVP);
+        if (currentState != null && currentState == state) return;
+
+        world.setGameRule(GameRules.PVP, state);
+        CustomMessage.infoAll("PVP is now " + (state ? "enabled" : "disabled") + ".");
     }
 
     private void cancelTask(org.bukkit.scheduler.BukkitRunnable task) {

@@ -75,7 +75,10 @@ public class BorderManager {
         meetupEndTimestamp = System.currentTimeMillis() + (meetupDuration * 1000);
         activeTask = new WorldBorderTask(plugin, this);
         activeTask.start();
-        activeTask.onCompleted.addListener((runnable) -> changeRadius());
+        activeTask.onCompleted.addListener((runnable) -> {
+            plugin.getGameManager().setPvpEnabled(true);
+            changeRadius();
+        });
     }
 
     public void cancelShrink() {
