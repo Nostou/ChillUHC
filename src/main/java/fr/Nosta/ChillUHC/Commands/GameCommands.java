@@ -128,7 +128,7 @@ public class GameCommands implements CommandExecutor {
 
                 im.openTeamInventory(player);
             }
-            case "infos" -> CustomMessage.custom(player, NamedTextColor.YELLOW, buildInfosMessage());
+            case "infos" -> player.sendMessage(buildInfosMessage());
         }
     }
 

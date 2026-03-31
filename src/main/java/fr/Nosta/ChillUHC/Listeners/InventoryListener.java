@@ -90,10 +90,10 @@ public class InventoryListener implements Listener {
             boolean enabled = plugin.getScenarioManager().toggle(scenario);
             plugin.getInventoryManager().refreshScenarioInventory();
 
-            Component status = Component.text(enabled ? "enabled." : "disabled.", enabled ? NamedTextColor.GREEN : NamedTextColor.RED);
-            CustomMessage.custom(player, NamedTextColor.GOLD,
-                    Component.text(scenario.getDisplayName() + " is now ", NamedTextColor.YELLOW)
-                            .append(status));
+            Component status = Component.text(enabled ? "ENABLED" : "DISABLED", enabled ? NamedTextColor.GREEN : NamedTextColor.RED);
+            player.sendMessage(Component.text(scenario.getDisplayName(), NamedTextColor.YELLOW)
+                    .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
+                    .append(status));
             return;
         }
 

@@ -15,10 +15,6 @@ public class CustomMessage {
         player.sendMessage(prefix(prefixColor).append(Component.text(message, messageColor)));
     }
 
-    private static void send(Player player, NamedTextColor prefixColor, Component message) {
-        player.sendMessage(prefix(prefixColor).append(message));
-    }
-
     public static void success(Player player, String message) {
         send(player, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, message);
     }
@@ -31,10 +27,6 @@ public class CustomMessage {
         send(player, NamedTextColor.GOLD, NamedTextColor.YELLOW, message);
     }
 
-    public static void custom(Player player, NamedTextColor prefixColor, Component message) {
-        send(player, prefixColor, message);
-    }
-
     public static void successAll(String message) {
         Bukkit.getOnlinePlayers().forEach(p -> success(p, message));
     }
@@ -45,9 +37,5 @@ public class CustomMessage {
 
     public static void infoAll(String message) {
         Bukkit.getOnlinePlayers().forEach(p -> info(p, message));
-    }
-
-    public static void customAll(NamedTextColor prefixColor, Component message) {
-        Bukkit.getOnlinePlayers().forEach(p -> custom(p, prefixColor, message));
     }
 }
