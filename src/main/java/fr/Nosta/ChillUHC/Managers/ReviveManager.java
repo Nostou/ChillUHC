@@ -4,6 +4,7 @@ import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
+import fr.Nosta.ChillUHC.Utils.ScenarioMessage;
 import fr.Nosta.ChillUHC.Utils.Spreader;
 import fr.Nosta.ChillUHC.Utils.TeamUtils;
 import net.kyori.adventure.text.Component;
@@ -12,11 +13,13 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -33,8 +36,10 @@ public class ReviveManager {
     private static final int MIN_SPAWN_DISTANCE = 50;
     private static final int AUTO_REVIVE_DELAY_SECONDS = 5;
     private static final double AUTO_REVIVE_HEALTH = 10.0;
-    private static final double MAX_HEALTH_PENALTY = 2.0;
-    private static final double MIN_MAX_HEALTH = 2.0;
+    private static final List<ItemStack> AUTO_REVIVE_REWARDS = List.of(
+            new ItemStack(Material.DIAMOND, 1),
+            new ItemStack(Material.GOLD_INGOT, 2)
+    );
 
     private final Main plugin;
     private final Map<UUID, DeathState> deadPlayers = new ConcurrentHashMap<>();
@@ -44,7 +49,8 @@ public class ReviveManager {
     }
 
     public void recordDeath(Player player, boolean automaticRevive) {
-        deadPlayers.put(player.getUniqueId(), new DeathState(plugin.getGameManager().getElapsedSeconds(), automaticRevive));
+        deadPlayers.put(player.getUniqueId(), new DeathState(automaticRevive));
+        if (automaticRevive) distributeAutoReviveRewards(player);
     }
 
     public boolean hasDeathState(Player player) {
@@ -134,27 +140,12 @@ public class ReviveManager {
 
         player.clearActivePotionEffects();
         reviveToSurvival(player, false);
-        boolean appliedPenalty = applyAutoRevivePenalty(player, deathState);
         player.setHealth(Math.min(getPlayerMaxHealth(player), AUTO_REVIVE_HEALTH));
         player.setFoodLevel(20);
         player.setSaturation(20f);
         player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 30 * 20, 4, false, false));
         player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1f, 1f);
-        sendAutomaticRevivedMessage(player, deathState, appliedPenalty);
-    }
-
-    private boolean applyAutoRevivePenalty(Player player, DeathState deathState) {
-        if (isInFirstHalfOfPreparation(deathState)) return false;
-
-        AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
-        if (attribute == null) return false;
-
-        double previousMaxHealth = attribute.getBaseValue();
-        double newMaxHealth = Math.max(MIN_MAX_HEALTH, previousMaxHealth - MAX_HEALTH_PENALTY);
-        if (newMaxHealth >= previousMaxHealth) return false;
-
-        attribute.setBaseValue(newMaxHealth);
-        return true;
+        sendAutomaticRevivedMessage(player);
     }
 
     private double getPlayerMaxHealth(Player player) {
@@ -167,14 +158,6 @@ public class ReviveManager {
 
         player.teleport(getRespawnLocation(player));
         player.setGameMode(GameMode.SURVIVAL);
-    }
-
-    private boolean isInFirstHalfOfPreparation(DeathState deathState) {
-        return deathState.elapsedSeconds() <= plugin.getBorderManager().getMeetupDuration() / 2;
-    }
-
-    private String getPreparationPhaseHalf(DeathState deathState) {
-        return isInFirstHalfOfPreparation(deathState) ? "first half" : "second half";
     }
 
     private void showCountdownTitle(Player player, int remainingSeconds) {
@@ -191,21 +174,21 @@ public class ReviveManager {
         CustomMessage.success(player, "You have been revived.");
     }
 
-    private void sendAutomaticRevivedMessage(Player player, DeathState deathState, boolean appliedPenalty) {
-        Component message = Component.text(
-                "Died in the " + getPreparationPhaseHalf(deathState) + " of preparation : ",
-                NamedTextColor.GREEN
-        );
-
-        if (appliedPenalty) message = message.append(Component.text("-1❤ penalty", NamedTextColor.RED));
-        else message = message.append(Component.text(" No penalty.", NamedTextColor.GREEN));
-
-        player.sendMessage(
-                Component.text("Chill Revive", NamedTextColor.YELLOW)
-                        .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
-                        .append(message)
-        );
+    private void sendAutomaticRevivedMessage(Player player) {
+        ScenarioMessage.success(player, "Chill Revive", "You have been automatically revived.");
     }
 
-    private record DeathState(long elapsedSeconds, boolean automaticRevive) { }
+    private void distributeAutoReviveRewards(Player deadPlayer) {
+        Team deadPlayerTeam = plugin.getTeamManager().getTeam(deadPlayer);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getUniqueId().equals(deadPlayer.getUniqueId())) continue;
+            if (player.getGameMode() != GameMode.SURVIVAL) continue;
+            if (deadPlayerTeam != null && deadPlayerTeam.equals(plugin.getTeamManager().getTeam(player))) continue;
+
+            player.give(AUTO_REVIVE_REWARDS);
+        }
+    }
+
+    private record DeathState(boolean automaticRevive) { }
 }
