@@ -10,7 +10,7 @@ public class ScenarioMessage {
     private ScenarioMessage() {}
 
     public static Component prefix(String scenarioName) {
-        return Component.text(scenarioName, NamedTextColor.GOLD).append(Component.text(" » ", NamedTextColor.DARK_GRAY));
+        return Component.text("["+scenarioName+"]", NamedTextColor.GOLD).append(Component.text(" » ", NamedTextColor.DARK_GRAY));
     }
 
     private static void send(Player player, String scenarioName, NamedTextColor messageColor, String message) {

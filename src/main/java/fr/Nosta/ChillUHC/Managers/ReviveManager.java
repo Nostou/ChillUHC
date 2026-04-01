@@ -146,6 +146,7 @@ public class ReviveManager {
         player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 30 * 20, 4, false, false));
         player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1f, 1f);
         sendAutomaticRevivedMessage(player);
+        sendAutomaticRevivedBroadcast(player);
     }
 
     private double getPlayerMaxHealth(Player player) {
@@ -175,7 +176,20 @@ public class ReviveManager {
     }
 
     private void sendAutomaticRevivedMessage(Player player) {
-        ScenarioMessage.success(player, "Chill Revive", "You have been automatically revived.");
+        ScenarioMessage.success(player, "Chill Revive", "You have been revived!");
+    }
+
+    private void sendAutomaticRevivedBroadcast(Player revivedPlayer) {
+        Component message = ScenarioMessage.prefix("Chill Revive")
+                .append(Component.text(revivedPlayer.getName(), plugin.getTeamManager().getColor(revivedPlayer)))
+                .append(Component.text(" has been revived! ", NamedTextColor.GREEN))
+                .append(Component.text("[+1d] ", NamedTextColor.AQUA))
+                .append(Component.text("[+2g]", NamedTextColor.GOLD));
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getUniqueId().equals(revivedPlayer.getUniqueId())) continue;
+            player.sendMessage(message);
+        }
     }
 
     private void distributeAutoReviveRewards(Player deadPlayer) {
