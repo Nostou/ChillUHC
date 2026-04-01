@@ -165,6 +165,11 @@ public class GameCommands implements CommandExecutor {
     }
 
     private void handleBorderCommand(Player player, BorderManager borderManager, String[] args) {
+        if (plugin.getGameManager().getState() != GameState.WAITING) {
+            CustomMessage.error(player, "WorldBorder can only be changed before the game starts.");
+            return;
+        }
+
         if (args.length < 2) {
             CustomMessage.error(player, "/hf border <startRadius> [targetRadius] [meetupDuration] [shrinkDuration]");
             return;
@@ -187,7 +192,7 @@ public class GameCommands implements CommandExecutor {
 
             CustomMessage.success(player, "WorldBorder has been updated !");
         } catch (NumberFormatException exception) {
-            CustomMessage.error(player, "Border values must be valid numbers.");
+            CustomMessage.error(player, "WorldBorder values must be valid numbers.");
         }
     }
 
