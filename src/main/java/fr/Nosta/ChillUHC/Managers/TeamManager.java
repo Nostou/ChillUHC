@@ -81,13 +81,13 @@ public class TeamManager {
 
             Component msg = Component.text("You are now ", NamedTextColor.WHITE)
                     .append(Component.text(newTeam.getName(), newTeam.color()));
-            player.sendMessage(msg);
+            CustomMessage.send(player, msg);
         }
         else {
             playerTeams.remove(player.getName());
 
             ffaTeam.addEntry(player.getName());
-            player.sendMessage(Component.text("You left your team", NamedTextColor.WHITE));
+            CustomMessage.info(player, "You left your team.");
         }
 
         player.setScoreboard(scoreboard);

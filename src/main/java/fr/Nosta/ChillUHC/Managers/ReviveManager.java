@@ -35,20 +35,17 @@ public class ReviveManager {
     }
 
     public boolean hasDeathState(Player player) {
-        return !deadPlayers.containsKey(player.getUniqueId());
-    }
-    public boolean clearDeathState(Player player) {
-        return deadPlayers.remove(player.getUniqueId()) == null;
+        return deadPlayers.containsKey(player.getUniqueId());
     }
 
-    public boolean revive(Player player) {
-        if (clearDeathState(player)) return false;
+    public void revive(Player player) {
+        if (!hasDeathState(player)) return;
+        deadPlayers.remove(player.getUniqueId());
 
         player.teleport(getRespawnLocation(player));
         player.setGameMode(GameMode.SURVIVAL);
         player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 5 * 20, 4, false, false));
         CustomMessage.success(player, "You have been revived.");
-        return true;
     }
 
     public double getPlayerMaxHealth(Player player) {

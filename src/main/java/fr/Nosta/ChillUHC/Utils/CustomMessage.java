@@ -9,10 +9,25 @@ public class CustomMessage {
 
     private CustomMessage() {}
 
-    private static Component prefix(NamedTextColor color) { return Component.text("[HF] ", color); }
+    private static Component prefix(NamedTextColor color) {
+        return Component.text("[HF] ", color);
+    }
+
+    public static Component prefix(String scenarioName) {
+        return Component.text("[" + scenarioName + "]", NamedTextColor.GOLD)
+                .append(Component.text(" » ", NamedTextColor.DARK_GRAY));
+    }
+
+    public static void send(Player player, Component message) {
+        player.sendMessage(message);
+    }
+
+    public static void broadcast(Component message) {
+        Bukkit.getOnlinePlayers().forEach(player -> send(player, message));
+    }
 
     private static void send(Player player, NamedTextColor prefixColor, NamedTextColor messageColor, String message) {
-        player.sendMessage(prefix(prefixColor).append(Component.text(message, messageColor)));
+        send(player, prefix(prefixColor).append(Component.text(message, messageColor)));
     }
 
     public static void success(Player player, String message) {
@@ -28,14 +43,14 @@ public class CustomMessage {
     }
 
     public static void successAll(String message) {
-        Bukkit.getOnlinePlayers().forEach(p -> success(p, message));
+        Bukkit.getOnlinePlayers().forEach(player -> success(player, message));
     }
 
     public static void errorAll(String message) {
-        Bukkit.getOnlinePlayers().forEach(p -> error(p, message));
+        Bukkit.getOnlinePlayers().forEach(player -> error(player, message));
     }
 
     public static void infoAll(String message) {
-        Bukkit.getOnlinePlayers().forEach(p -> info(p, message));
+        Bukkit.getOnlinePlayers().forEach(player -> info(player, message));
     }
 }

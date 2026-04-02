@@ -132,7 +132,7 @@ public class GameCommands implements CommandExecutor {
 
                 im.openTeamInventory(player);
             }
-            case "infos" -> player.sendMessage(buildInfosMessage());
+            case "infos" -> CustomMessage.send(player, buildInfosMessage());
         }
     }
 
@@ -223,7 +223,7 @@ public class GameCommands implements CommandExecutor {
         }
 
         Player target = Bukkit.getPlayerExact(args[1]);
-        if (target == null || target.getGameMode() != GameMode.SPECTATOR || reviveManager.hasDeathState(target) || !reviveManager.revive(target)) {
+        if (target == null || target.getGameMode() != GameMode.SPECTATOR || !reviveManager.hasDeathState(target)) {
             CustomMessage.error(player, "This player cannot be revived.");
             return;
         }

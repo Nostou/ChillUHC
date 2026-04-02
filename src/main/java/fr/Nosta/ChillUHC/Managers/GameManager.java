@@ -59,7 +59,7 @@ public class GameManager {
         plugin.getScoreboardManager().initialize();
         plugin.getTabManager().start();
 
-        plugin.getLogger().warning("Game initialized.");
+        plugin.getLogger().info("Game initialized.");
     }
 
     public void startGame(boolean isDebug) {
@@ -118,6 +118,20 @@ public class GameManager {
 
         CustomMessage.errorAll("Forced stop of the game by an operator.");
         currentState = GameState.WAITING;
+    }
+
+    public void abortStart(String reason) {
+        if (currentState != GameState.STARTING) {
+            plugin.getLogger().warning("Ignored game start abort outside STARTING state: " + reason);
+            return;
+        }
+
+        cancelTask(startTask);
+        startTask = null;
+        currentState = GameState.WAITING;
+
+        plugin.getLogger().warning(reason);
+        CustomMessage.errorAll("Game start cancelled. Check server logs for details.");
     }
 
     public void setPvpEnabled(boolean state) {

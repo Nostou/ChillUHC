@@ -1,6 +1,7 @@
 package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,11 +23,13 @@ public class ChatListener implements Listener {
         event.setCancelled(true);
 
         Player player = event.getPlayer();
+        Component chatMessage = event.message();
+
         NamedTextColor playerColor = plugin.getTeamManager().getColor(player);
         Component message = Component.text(player.getName(), playerColor)
                 .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
-                .append(event.message().color(NamedTextColor.WHITE));
+                .append(chatMessage.color(NamedTextColor.WHITE));
 
-        Bukkit.getServer().sendMessage(message);
+        CustomMessage.broadcast(message);
     }
 }

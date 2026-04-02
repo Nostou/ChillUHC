@@ -3,7 +3,7 @@ package fr.Nosta.ChillUHC.Scenarios;
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
-import fr.Nosta.ChillUHC.Utils.ScenarioMessage;
+import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import fr.Nosta.ChillUHC.Utils.TimeUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -74,7 +74,7 @@ public class IronmanScenario implements Scenario, Listener {
         IronmanReward reward = IronmanReward.fromRemainingCount(playerList.size());
         if (reward != null) applyReward(player, reward);
 
-        Bukkit.broadcast(buildDamageMessage(player, reward));
+        CustomMessage.broadcast(buildDamageMessage(player, reward));
         checkForWinner();
     }
 
@@ -87,7 +87,7 @@ public class IronmanScenario implements Scenario, Listener {
 
         tracking = false;
         applyReward(winner, IronmanReward.FIRST);
-        Bukkit.broadcast(buildWinnerMessage(winner));
+        CustomMessage.broadcast(buildWinnerMessage(winner));
     }
 
     private void applyReward(Player player, IronmanReward reward) {
@@ -99,8 +99,7 @@ public class IronmanScenario implements Scenario, Listener {
 
     private Component buildDamageMessage(Player player, IronmanReward reward) {
         String timeElapsed = TimeUtils.formatToCompactMinutesSeconds(plugin.getGameManager().getElapsedSeconds());
-        Component message = ScenarioMessage.prefix("Ironman")
-                .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
+        Component message = CustomMessage.prefix("Ironman")
                 .append(Component.text(player.getName(), plugin.getTeamManager().getColor(player)))
                 .append(Component.text(" took damage!", NamedTextColor.GRAY))
                 .append(Component.text(" [" + timeElapsed + "]", NamedTextColor.AQUA))
@@ -114,8 +113,7 @@ public class IronmanScenario implements Scenario, Listener {
     }
 
     private Component buildWinnerMessage(Player player) {
-        return ScenarioMessage.prefix("Ironman")
-                .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
+        return CustomMessage.prefix("Ironman")
                 .append(Component.text(player.getName(), plugin.getTeamManager().getColor(player)))
                 .append(Component.text(" is the ", NamedTextColor.GRAY))
                 .append(Component.text("Ironman", NamedTextColor.GOLD, TextDecoration.BOLD, TextDecoration.UNDERLINED))

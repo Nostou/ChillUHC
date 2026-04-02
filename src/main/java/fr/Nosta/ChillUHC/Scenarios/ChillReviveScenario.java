@@ -3,7 +3,7 @@ package fr.Nosta.ChillUHC.Scenarios;
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
-import fr.Nosta.ChillUHC.Utils.ScenarioMessage;
+import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -16,8 +16,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scoreboard.Team;
@@ -30,7 +28,6 @@ public class ChillReviveScenario implements Scenario, Listener {
 
     private static final int AUTO_REVIVE_DELAY_SECONDS = 5;
     private static final double AUTO_REVIVE_HEALTH = 10.0;
-    private static final String SCENARIO_NAME = "Chill Revive";
     private static final List<ItemStack> AUTO_REVIVE_REWARDS = List.of(
             new ItemStack(Material.DIAMOND, 1),
             new ItemStack(Material.GOLD_INGOT, 2)
@@ -106,8 +103,6 @@ public class ChillReviveScenario implements Scenario, Listener {
     }
 
     private void reviveAutomatically(Player player) {
-        if (!plugin.getReviveManager().clearDeathState(player)) return;
-
         plugin.getReviveManager().revive(player);
         player.setHealth(Math.min(plugin.getReviveManager().getPlayerMaxHealth(player), AUTO_REVIVE_HEALTH));
         plugin.getScoreboardManager().updateHealth(player);
@@ -128,7 +123,7 @@ public class ChillReviveScenario implements Scenario, Listener {
     private void distributeAutoReviveRewards(Player deadPlayer) {
         Team deadPlayerTeam = plugin.getTeamManager().getTeam(deadPlayer);
 
-        Component message = ScenarioMessage.prefix(SCENARIO_NAME)
+        Component message = CustomMessage.prefix("Chill Revive")
                 .append(Component.text(deadPlayer.getName(), plugin.getTeamManager().getColor(deadPlayer)))
                 .append(Component.text(" has been revived! ", NamedTextColor.GREEN))
                 .append(Component.text("[+1 diamond] ", NamedTextColor.AQUA))
@@ -139,7 +134,7 @@ public class ChillReviveScenario implements Scenario, Listener {
             if (player.getGameMode() != GameMode.SURVIVAL) continue;
             if (deadPlayerTeam != null && deadPlayerTeam.equals(plugin.getTeamManager().getTeam(player))) continue;
 
-            player.sendMessage(message);
+            CustomMessage.send(player, message);
             player.give(AUTO_REVIVE_REWARDS);
         }
     }

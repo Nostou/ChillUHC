@@ -32,8 +32,9 @@ public class StartGameTask extends BukkitRunnable {
 
     public void start() {
         if (debug) {
-            spreadPlayers(true);
-            finish();
+            if (spreadPlayers(true)) {
+                finish();
+            }
             return;
         }
 
@@ -57,19 +58,33 @@ public class StartGameTask extends BukkitRunnable {
         }
     }
 
-    private void spreadPlayers(boolean instant) {
+    private boolean spreadPlayers(boolean instant) {
         Location center = plugin.getSpawnLocation();
         int radius = plugin.getBorderManager().getStartRadius();
 
         int teamCount = getTeamCount();
         boolean isFFA = teamCount == 0;
         int count = isFFA ? Bukkit.getOnlinePlayers().size() : teamCount;
+        if (count <= 0) {
+            plugin.getGameManager().abortStart("Unable to start the game without any players to spread.");
+            if (!debug) {
+                cancel();
+            }
+            return false;
+        }
 
         int minDistance = (int) (radius / Math.sqrt(count));
         minDistance = Math.max(minDistance, 50);
 
         List<Location> targetList = Spreader.generate(center, radius, count, minDistance);
-        plugin.getLogger().warning((isFFA ? "FFA -> " : "TEAM -> " )+"Target count ["+targetList.size()+"]");
+        plugin.getLogger().info((isFFA ? "FFA -> " : "TEAM -> ") + "Target count [" + targetList.size() + "/" + count + "]");
+        if (targetList.size() < count) {
+            plugin.getGameManager().abortStart("Unable to generate enough spread locations for game start (" + targetList.size() + "/" + count + ").");
+            if (!debug) {
+                cancel();
+            }
+            return false;
+        }
 
         if (isFFA) {
             int index = 0;
@@ -99,6 +114,8 @@ public class StartGameTask extends BukkitRunnable {
                 index++;
             }
         }
+
+        return true;
     }
 
     private int getTeamCount() {

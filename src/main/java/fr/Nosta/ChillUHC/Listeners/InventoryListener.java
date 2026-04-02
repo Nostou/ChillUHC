@@ -91,7 +91,7 @@ public class InventoryListener implements Listener {
             plugin.getInventoryManager().refreshScenarioInventory();
 
             Component status = Component.text(enabled ? "ENABLED" : "DISABLED", enabled ? NamedTextColor.GREEN : NamedTextColor.RED);
-            player.sendMessage(Component.text(scenario.getDisplayName(), NamedTextColor.YELLOW)
+            CustomMessage.send(player, Component.text(scenario.getDisplayName(), NamedTextColor.YELLOW)
                     .append(Component.text(" » ", NamedTextColor.DARK_GRAY))
                     .append(status));
             return;

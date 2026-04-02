@@ -4,10 +4,11 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import fr.Nosta.ChillUHC.Utils.NmsSkinApplier;
-import fr.Nosta.ChillUHC.Utils.ScenarioMessage;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -30,7 +31,6 @@ public class AnonymousScenario implements Scenario, Listener {
     private static final String CONFIG_PATH = "anonymous.skin.";
     private static final String TAB_MASK = "???";
     private static final String TEXTURES_PROPERTY = "textures";
-    private static final String SCENARIO_NAME = "Anonymous";
 
     private final Main plugin;
     private final NmsSkinApplier nmsSkinApplier;
@@ -64,7 +64,7 @@ public class AnonymousScenario implements Scenario, Listener {
     public void openSkinEditor(Player player) {
         pendingSkinInputs.add(player.getUniqueId());
         player.closeInventory();
-        ScenarioMessage.info(player, SCENARIO_NAME, "Type the skin name in chat. Type 'clear' to remove it or 'cancel' to abort.");
+        sendScenarioInfo(player, "Type the skin name in chat. Type 'clear' to remove it or 'cancel' to abort.");
     }
 
     public String getConfiguredSkinSource() {
@@ -91,7 +91,7 @@ public class AnonymousScenario implements Scenario, Listener {
         String input = normalizeSkinName(PlainTextComponentSerializer.plainText().serialize(event.message()));
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (input.equalsIgnoreCase("cancel")) {
-                ScenarioMessage.info(player, SCENARIO_NAME, "Anonymous skin update cancelled.");
+                sendScenarioInfo(player, "Anonymous skin update cancelled.");
                 return;
             }
 
@@ -101,7 +101,7 @@ public class AnonymousScenario implements Scenario, Listener {
             }
 
             if (input.isBlank()) {
-                ScenarioMessage.error(player, SCENARIO_NAME, "Please type a valid skin name, 'clear', or 'cancel'.");
+                sendScenarioError(player, "Please type a valid skin name, 'clear', or 'cancel'.");
                 return;
             }
 
@@ -141,13 +141,13 @@ public class AnonymousScenario implements Scenario, Listener {
     }
 
     private void setSharedSkinSource(Player sender, String sourceName) {
-        ScenarioMessage.info(sender, SCENARIO_NAME, "Resolving skin from " + sourceName + "...");
+        sendScenarioInfo(sender, "Resolving skin from " + sourceName + "...");
 
         Bukkit.createProfile(sourceName).update().thenAccept(profile ->
                 Bukkit.getScheduler().runTask(plugin, () -> applyResolvedSkin(sender, sourceName, (PlayerProfile) profile))
         ).exceptionally(throwable -> {
             Bukkit.getScheduler().runTask(plugin, () ->
-                    ScenarioMessage.error(sender, SCENARIO_NAME, "Unable to resolve that skin source."));
+                    sendScenarioError(sender, "Unable to resolve that skin source."));
             return null;
         });
     }
@@ -163,13 +163,13 @@ public class AnonymousScenario implements Scenario, Listener {
         }
 
         plugin.getInventoryManager().refreshScenarioInventory();
-        ScenarioMessage.success(sender, SCENARIO_NAME, "Anonymous shared skin cleared.");
+        sendScenarioSuccess(sender, "Anonymous shared skin cleared.");
     }
 
     private void applyResolvedSkin(Player sender, String sourceName, PlayerProfile sourceProfile) {
         ProfileProperty textures = getTexturesProperty(sourceProfile).orElse(null);
         if (textures == null) {
-            ScenarioMessage.error(sender, SCENARIO_NAME, "That player has no usable skin.");
+            sendScenarioError(sender, "That player has no usable skin.");
             return;
         }
 
@@ -183,7 +183,7 @@ public class AnonymousScenario implements Scenario, Listener {
         }
 
         plugin.getInventoryManager().refreshScenarioInventory();
-        ScenarioMessage.success(sender, SCENARIO_NAME, "Anonymous shared skin updated to " + sourceName + ".");
+        sendScenarioSuccess(sender, "Anonymous shared skin updated to " + sourceName + ".");
     }
 
     private void applyConfiguredSkin(Player player) {
@@ -236,6 +236,18 @@ public class AnonymousScenario implements Scenario, Listener {
         for (Player player : Bukkit.getOnlinePlayers()) {
             action.accept(player);
         }
+    }
+
+    private void sendScenarioInfo(Player player, String message) {
+        CustomMessage.send(player, CustomMessage.prefix("Anonymous").append(Component.text(message, NamedTextColor.YELLOW)));
+    }
+
+    private void sendScenarioSuccess(Player player, String message) {
+        CustomMessage.send(player, CustomMessage.prefix("Anonymous").append(Component.text(message, NamedTextColor.GREEN)));
+    }
+
+    private void sendScenarioError(Player player, String message) {
+        CustomMessage.send(player, CustomMessage.prefix("Anonymous").append(Component.text(message, NamedTextColor.RED)));
     }
 
     private Optional<ProfileProperty> getTexturesProperty(PlayerProfile profile) {
