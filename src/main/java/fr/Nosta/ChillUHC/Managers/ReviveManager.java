@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
 import java.util.List;
@@ -42,7 +44,9 @@ public class ReviveManager {
     public boolean revive(Player player) {
         if (clearDeathState(player)) return false;
 
-        reviveToSurvival(player, true);
+        player.teleport(getRespawnLocation(player));
+        player.setGameMode(GameMode.SURVIVAL);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 5 * 20, 4, false, false));
         CustomMessage.success(player, "You have been revived.");
         return true;
     }
@@ -50,13 +54,6 @@ public class ReviveManager {
     public double getPlayerMaxHealth(Player player) {
         AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
         return attribute != null ? attribute.getBaseValue() : 20.0;
-    }
-
-    public void reviveToSurvival(Player player, boolean resetPlayer) {
-        if (resetPlayer) plugin.getGameManager().resetPlayer(player);
-
-        player.teleport(getRespawnLocation(player));
-        player.setGameMode(GameMode.SURVIVAL);
     }
 
     private Location getRespawnLocation(Player player) {

@@ -108,14 +108,10 @@ public class ChillReviveScenario implements Scenario, Listener {
     private void reviveAutomatically(Player player) {
         if (!plugin.getReviveManager().clearDeathState(player)) return;
 
-        player.clearActivePotionEffects();
-        plugin.getReviveManager().reviveToSurvival(player, false);
+        plugin.getReviveManager().revive(player);
         player.setHealth(Math.min(plugin.getReviveManager().getPlayerMaxHealth(player), AUTO_REVIVE_HEALTH));
-        player.setFoodLevel(20);
-        player.setSaturation(20f);
-        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 5 * 20, 4, false, false));
+        plugin.getScoreboardManager().updateHealth(player);
         player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1f, 1f);
-        sendAutomaticRevivedMessage(player);
         distributeAutoReviveRewards(player);
     }
 
@@ -127,10 +123,6 @@ public class ChillReviveScenario implements Scenario, Listener {
         );
 
         player.showTitle(title);
-    }
-
-    private void sendAutomaticRevivedMessage(Player player) {
-        ScenarioMessage.success(player, SCENARIO_NAME, "You have been revived!");
     }
 
     private void distributeAutoReviveRewards(Player deadPlayer) {

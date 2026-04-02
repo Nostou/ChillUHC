@@ -93,6 +93,7 @@ public class GameManager {
             player.give(starterItems);
             player.setGameMode(GameMode.SURVIVAL);
             player.addPotionEffects(starterEffects);
+            plugin.getScoreboardManager().updateHealth(player);
         }
 
         compassTask = new CompassTask(plugin);
@@ -109,8 +110,8 @@ public class GameManager {
 
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.teleport(plugin.getSpawnLocation());
-            resetPlayer(player);
             player.setGameMode(GameMode.ADVENTURE);
+            resetPlayer(player);
         }
 
         reset();
@@ -161,6 +162,7 @@ public class GameManager {
         player.setExp(0.0f);
         player.setLevel(0);
         player.setTotalExperience(0);
+        plugin.getScoreboardManager().updateHealth(player);
     }
 
     private void resetPlayerMaxHealth(Player player) {

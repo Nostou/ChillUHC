@@ -75,6 +75,7 @@ public final class Main extends JavaPlugin
         getServer().getPluginManager().registerEvents(new ConnexionListener(this), this);
         getServer().getPluginManager().registerEvents(new DeathListener(this), this);
         getServer().getPluginManager().registerEvents(new DiamondListener(this), this);
+        getServer().getPluginManager().registerEvents(new HealthListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new PvPListener(this), this);

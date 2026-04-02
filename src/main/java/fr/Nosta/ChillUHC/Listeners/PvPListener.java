@@ -1,14 +1,19 @@
 package fr.Nosta.ChillUHC.Listeners;
 
-import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
+import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.SpectralArrow;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -137,9 +142,7 @@ public class PvPListener implements Listener {
                 int adjustedDuration = effect.getDuration() / 8;
                 defender.addPotionEffect(new PotionEffect(effect.getType(), adjustedDuration, effect.getAmplifier()));
             }
-        }
-
-        else if (arrow instanceof SpectralArrow spectralArrow) {
+        } else if (arrow instanceof SpectralArrow spectralArrow) {
             defender.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, spectralArrow.getGlowingTicks(), 0));
         }
     }
@@ -155,27 +158,27 @@ public class PvPListener implements Listener {
         Bukkit.getScheduler().runTask(plugin, () -> {
             if (target.isDead()) return;
 
-            int halfHearts = (int)(target.getHealth() + target.getAbsorptionAmount())+1;
+            int healthPercent = plugin.getScoreboardManager().getHealthPercent(target);
             Component displayedName = plugin.getScenarioManager().isEnabled(ScenarioType.ANONYMOUS)
                     ? Component.text(ANONYMOUS_MASK, plugin.getTeamManager().getColor(target))
                     : Component.text(target.getName(), plugin.getTeamManager().getColor(target));
 
             Component msg = displayedName
                     .append(Component.text(" is now at ", NamedTextColor.GRAY))
-                    .append(getColoredHealth(halfHearts));
+                    .append(getColoredHealthPercent(healthPercent));
 
             attacker.sendMessage(msg);
         });
     }
 
-    private Component getColoredHealth(int health) {
-        String s = health+"❤";
+    private Component getColoredHealthPercent(int healthPercent) {
+        String value = healthPercent + "%";
         NamedTextColor color;
 
-        if (health > 12) color = NamedTextColor.GREEN;
-        else if (health > 6) color = NamedTextColor.YELLOW;
+        if (healthPercent > 60) color = NamedTextColor.GREEN;
+        else if (healthPercent > 30) color = NamedTextColor.YELLOW;
         else color = NamedTextColor.RED;
 
-        return Component.text(s, color);
+        return Component.text(value, color);
     }
 }

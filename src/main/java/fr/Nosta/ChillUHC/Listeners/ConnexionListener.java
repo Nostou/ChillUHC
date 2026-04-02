@@ -28,8 +28,8 @@ public class ConnexionListener implements Listener {
 
         if (plugin.getGameManager().getState() != GameState.PLAYING) {
             player.teleport(plugin.getSpawnLocation());
-            plugin.getGameManager().resetPlayer(player);
             player.setGameMode(GameMode.ADVENTURE);
+            plugin.getGameManager().resetPlayer(player);
         }
 
         AttributeInstance attackSpeed = player.getAttribute(Attribute.ATTACK_SPEED);
