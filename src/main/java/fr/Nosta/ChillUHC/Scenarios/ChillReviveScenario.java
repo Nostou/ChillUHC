@@ -3,13 +3,38 @@ package fr.Nosta.ChillUHC.Scenarios;
 import fr.Nosta.ChillUHC.Enums.GameState;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
-import org.bukkit.GameRule;
+import fr.Nosta.ChillUHC.Utils.ScenarioMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.GameRules;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Team;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
 
 public class ChillReviveScenario implements Scenario, Listener {
+
+    private static final int AUTO_REVIVE_DELAY_SECONDS = 5;
+    private static final double AUTO_REVIVE_HEALTH = 10.0;
+    private static final String SCENARIO_NAME = "Chill Revive";
+    private static final List<ItemStack> AUTO_REVIVE_REWARDS = List.of(
+            new ItemStack(Material.DIAMOND, 1),
+            new ItemStack(Material.GOLD_INGOT, 2)
+    );
 
     private final Main plugin;
     private BukkitTask meetupTask;
@@ -23,6 +48,18 @@ public class ChillReviveScenario implements Scenario, Listener {
     @Override
     public ScenarioType getType() {
         return ScenarioType.CHILL_REVIVE;
+    }
+
+    public boolean isAutomaticReviveActive() {
+        if (!plugin.getScenarioManager().isEnabled(getType())) return false;
+        if (plugin.getGameManager().getState() != GameState.PLAYING) return false;
+
+        return plugin.getGameManager().getElapsedSeconds() < plugin.getBorderManager().getMeetupDuration();
+    }
+
+    public void handleAutomaticDeath(Player player) {
+        plugin.getReviveManager().recordDeath(player);
+        scheduleAutomaticRevive(player);
     }
 
     private void onGameStart() {
@@ -39,6 +76,80 @@ public class ChillReviveScenario implements Scenario, Listener {
 
             world.setGameRule(GameRules.KEEP_INVENTORY, false);
         }, meetupTicks);
+    }
+
+    private void scheduleAutomaticRevive(Player player) {
+        UUID playerId = player.getUniqueId();
+
+        new BukkitRunnable() {
+            private int remainingSeconds = AUTO_REVIVE_DELAY_SECONDS;
+
+            @Override
+            public void run() {
+                Player target = plugin.getServer().getPlayer(playerId);
+                if (target == null || !plugin.getReviveManager().hasDeathState(target)) {
+                    cancel();
+                    return;
+                }
+
+                if (remainingSeconds > 0) {
+                    showCountdownTitle(target, remainingSeconds);
+                    target.playSound(target.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1.2f);
+                    remainingSeconds--;
+                    return;
+                }
+
+                reviveAutomatically(target);
+                cancel();
+            }
+        }.runTaskTimer(plugin, 0L, 20L);
+    }
+
+    private void reviveAutomatically(Player player) {
+        if (!plugin.getReviveManager().clearDeathState(player)) return;
+
+        player.clearActivePotionEffects();
+        plugin.getReviveManager().reviveToSurvival(player, false);
+        player.setHealth(Math.min(plugin.getReviveManager().getPlayerMaxHealth(player), AUTO_REVIVE_HEALTH));
+        player.setFoodLevel(20);
+        player.setSaturation(20f);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 5 * 20, 4, false, false));
+        player.playSound(player.getLocation(), Sound.ITEM_TOTEM_USE, 1f, 1f);
+        sendAutomaticRevivedMessage(player);
+        distributeAutoReviveRewards(player);
+    }
+
+    private void showCountdownTitle(Player player, int remainingSeconds) {
+        Title title = Title.title(
+                Component.text("Respawn in " + remainingSeconds, NamedTextColor.YELLOW),
+                Component.text("Get ready...", NamedTextColor.GRAY),
+                Title.Times.times(Duration.ZERO, Duration.ofMillis(1100), Duration.ofMillis(100))
+        );
+
+        player.showTitle(title);
+    }
+
+    private void sendAutomaticRevivedMessage(Player player) {
+        ScenarioMessage.success(player, SCENARIO_NAME, "You have been revived!");
+    }
+
+    private void distributeAutoReviveRewards(Player deadPlayer) {
+        Team deadPlayerTeam = plugin.getTeamManager().getTeam(deadPlayer);
+
+        Component message = ScenarioMessage.prefix(SCENARIO_NAME)
+                .append(Component.text(deadPlayer.getName(), plugin.getTeamManager().getColor(deadPlayer)))
+                .append(Component.text(" has been revived! ", NamedTextColor.GREEN))
+                .append(Component.text("[+1 diamond] ", NamedTextColor.AQUA))
+                .append(Component.text("[2 golds]", NamedTextColor.GOLD));
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getUniqueId().equals(deadPlayer.getUniqueId())) continue;
+            if (player.getGameMode() != GameMode.SURVIVAL) continue;
+            if (deadPlayerTeam != null && deadPlayerTeam.equals(plugin.getTeamManager().getTeam(player))) continue;
+
+            player.sendMessage(message);
+            player.give(AUTO_REVIVE_REWARDS);
+        }
     }
 
     private void reset() {

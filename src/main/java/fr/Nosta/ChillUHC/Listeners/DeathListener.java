@@ -1,7 +1,9 @@
 package fr.Nosta.ChillUHC.Listeners;
 
 import fr.Nosta.ChillUHC.Enums.GameState;
+import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
+import fr.Nosta.ChillUHC.Scenarios.ChillReviveScenario;
 import fr.Nosta.ChillUHC.Utils.Broadcaster;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import org.bukkit.GameMode;
@@ -35,14 +37,15 @@ public class DeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        boolean automaticRevive = plugin.getReviveManager().isAutomaticReviveActive();
+        ChillReviveScenario chillReviveScenario = plugin.getScenarioManager().getScenario(ScenarioType.CHILL_REVIVE, ChillReviveScenario.class);
+        boolean automaticRevive = chillReviveScenario != null && chillReviveScenario.isAutomaticReviveActive();
         dropStuff(event, !automaticRevive);
 
         if (plugin.getGameManager().getState() == GameState.PLAYING) {
             Player player = event.getPlayer();
-            plugin.getReviveManager().recordDeath(player, automaticRevive);
             player.setGameMode(GameMode.SPECTATOR);
-            if (automaticRevive) plugin.getReviveManager().scheduleAutomaticRevive(player);
+            if (automaticRevive) chillReviveScenario.handleAutomaticDeath(player);
+            else plugin.getReviveManager().recordDeath(player);
         }
 
         Broadcaster.soundAll(Sound.ENTITY_WITHER_SPAWN, 1, 1);

@@ -223,7 +223,7 @@ public class GameCommands implements CommandExecutor {
         }
 
         Player target = Bukkit.getPlayerExact(args[1]);
-        if (target == null || target.getGameMode() != GameMode.SPECTATOR || !reviveManager.hasDeathState(target) || !reviveManager.revive(target)) {
+        if (target == null || target.getGameMode() != GameMode.SPECTATOR || reviveManager.hasDeathState(target) || !reviveManager.revive(target)) {
             CustomMessage.error(player, "This player cannot be revived.");
             return;
         }
