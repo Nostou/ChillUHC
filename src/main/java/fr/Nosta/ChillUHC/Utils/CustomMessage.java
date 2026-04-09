@@ -26,20 +26,20 @@ public class CustomMessage {
         Bukkit.getOnlinePlayers().forEach(player -> send(player, message));
     }
 
-    private static void send(Player player, NamedTextColor prefixColor, NamedTextColor messageColor, String message) {
+    private static void sendInternal(Player player, NamedTextColor prefixColor, NamedTextColor messageColor, String message) {
         send(player, prefix(prefixColor).append(Component.text(message, messageColor)));
     }
 
     public static void success(Player player, String message) {
-        send(player, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, message);
+        sendInternal(player, NamedTextColor.DARK_GREEN, NamedTextColor.GREEN, message);
     }
 
     public static void error(Player player, String message) {
-        send(player, NamedTextColor.DARK_RED, NamedTextColor.RED, message);
+        sendInternal(player, NamedTextColor.DARK_RED, NamedTextColor.RED, message);
     }
 
     public static void info(Player player, String message) {
-        send(player, NamedTextColor.GOLD, NamedTextColor.YELLOW, message);
+        sendInternal(player, NamedTextColor.GOLD, NamedTextColor.YELLOW, message);
     }
 
     public static void successAll(String message) {

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class CommandCompleter implements TabCompleter {
 
@@ -39,12 +40,7 @@ public class CommandCompleter implements TabCompleter {
                 switch (subCommand) {
                     case "start" -> addSuggestion(result, args[1].toLowerCase(), "debug");
                     case "border" -> result.add("<startRadius>");
-                    case "revive" -> {
-                        for (Player p : Bukkit.getOnlinePlayers()) {
-                            if (p.getGameMode() != GameMode.SPECTATOR) continue;
-                            result.add(p.getName());
-                        }
-                    }
+                    case "revive" -> result.addAll(getPlayers(p -> p.getGameMode() == GameMode.SPECTATOR));
                 }
             }
             case 3 -> {
@@ -74,13 +70,19 @@ public class CommandCompleter implements TabCompleter {
             }
             case 2 -> {
                 if (subCommand.equals("invsee")) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        if (p.getGameMode() != GameMode.SPECTATOR || p == player) continue;
-                        result.add(p.getName());
-                    }
+                    result.addAll(getPlayers(p -> p.getGameMode() == GameMode.SPECTATOR && p != player));
                 }
             }
         }
+    }
+
+    private List<String> getPlayers(Predicate<Player> condition) {
+        List<String> players = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!condition.test(player)) continue;
+            players.add(player.getName());
+        }
+        return players;
     }
 
     private void addSuggestion(List<String> result, String input, String suggestion) {

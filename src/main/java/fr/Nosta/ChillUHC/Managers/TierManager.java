@@ -136,9 +136,7 @@ public class TierManager {
 
         double newMaxHealth = 20.0 + getBonusMaxHealth(player);
         attribute.setBaseValue(newMaxHealth);
-        if (player.getHealth() > newMaxHealth) {
-            player.setHealth(newMaxHealth);
-        }
+        player.setHealth(newMaxHealth);
     }
 
     private Component logTier(int value) {

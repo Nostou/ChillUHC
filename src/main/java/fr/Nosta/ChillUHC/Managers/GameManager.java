@@ -88,8 +88,6 @@ public class GameManager {
         for (Player player : Bukkit.getOnlinePlayers()) {
             resetPlayer(player);
             plugin.getTierManager().applyTierAttributes(player);
-            AttributeInstance attribute = player.getAttribute(Attribute.MAX_HEALTH);
-            if (attribute != null) player.setHealth(attribute.getBaseValue());
             player.give(starterItems);
             player.setGameMode(GameMode.SURVIVAL);
             player.addPotionEffects(starterEffects);
@@ -170,13 +168,8 @@ public class GameManager {
         player.getInventory().clear();
         player.clearActivePotionEffects();
         resetPlayerMaxHealth(player);
-        player.setHealth(20.0);
-        player.setFoodLevel(20);
-        player.setSaturation(20f);
-        player.setExp(0.0f);
-        player.setLevel(0);
-        player.setTotalExperience(0);
-        plugin.getScoreboardManager().updateHealth(player);
+        resetFoodLevel(player);
+        resetExperience(player);
     }
 
     private void resetPlayerMaxHealth(Player player) {
@@ -184,8 +177,18 @@ public class GameManager {
         if (attribute == null) return;
 
         attribute.setBaseValue(20.0);
-        if (player.getHealth() > 20.0) {
-            player.setHealth(20.0);
-        }
+        player.setHealth(20.0);
+        plugin.getScoreboardManager().updateHealth(player);
+    }
+
+    private void resetFoodLevel(Player player) {
+        player.setFoodLevel(20);
+        player.setSaturation(20f);
+    }
+
+    private void resetExperience(Player player) {
+        player.setExp(0.0f);
+        player.setLevel(0);
+        player.setTotalExperience(0);
     }
 }

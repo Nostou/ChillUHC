@@ -3,6 +3,9 @@ package fr.Nosta.ChillUHC.Managers;
 import fr.Nosta.ChillUHC.Enums.ScenarioType;
 import fr.Nosta.ChillUHC.Main;
 import fr.Nosta.ChillUHC.Scenarios.Scenario;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.EnumMap;
@@ -100,5 +103,27 @@ public class ScenarioManager {
                 .map(Map.Entry::getKey)
                 .sorted((first, second) -> String.CASE_INSENSITIVE_ORDER.compare(first.getDisplayName(), second.getDisplayName()))
                 .collect(Collectors.toList());
+    }
+
+    public Component logScenarios() {
+        List<ScenarioType> enabledScenarios = getEnabledScenarios();
+        if (enabledScenarios.isEmpty()) {
+            return Component.text("No active scenarios", NamedTextColor.GRAY);
+        }
+
+        Component result = Component.text("\n\nScenarios » ", NamedTextColor.AQUA);
+        Component separator = Component.text("/", NamedTextColor.DARK_GRAY);
+
+        for (int i = 0; i < enabledScenarios.size(); i++) {
+            if (i > 0) {
+                result = result.append(separator);
+            }
+
+            ScenarioType scenario = enabledScenarios.get(i);
+            result = result.append(Component.text(scenario.getDisplayName(), NamedTextColor.GREEN)
+                    .hoverEvent(HoverEvent.showText(Component.text(scenario.getDescription(), NamedTextColor.GRAY))));
+        }
+
+        return result;
     }
 }

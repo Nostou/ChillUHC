@@ -10,7 +10,6 @@ import fr.Nosta.ChillUHC.Managers.ReviveManager;
 import fr.Nosta.ChillUHC.Utils.CustomMessage;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
@@ -18,7 +17,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 
 public class GameCommands implements CommandExecutor {
 
@@ -34,10 +32,7 @@ public class GameCommands implements CommandExecutor {
         if (!cmd.getName().equalsIgnoreCase("hf") || args.length == 0) return true;
 
         String subCommand = args[0].toLowerCase();
-        if (player.isOp() && handleOpCommands(player, subCommand, args)) {
-            return true;
-        }
-
+        if (player.isOp() && handleOpCommands(player, subCommand, args)) return true;
         handleNonOpCommands(player, subCommand, args);
 
         return true;
@@ -106,7 +101,7 @@ public class GameCommands implements CommandExecutor {
 
         switch (subCommand) {
             case "invsee" -> {
-                if (!player.isOp() && (player.getGameMode() != GameMode.SPECTATOR || plugin.getGameManager().getState() != GameState.PLAYING)) {
+                if (!player.isOp() && (player.getGameMode() != GameMode.SPECTATOR || gm.getState() != GameState.PLAYING)) {
                     CustomMessage.error(player, "You don't have permission to use this command.");
                     return;
                 }
@@ -138,30 +133,7 @@ public class GameCommands implements CommandExecutor {
 
     private Component buildInfosMessage() {
         return plugin.getTierManager().logTierList()
-                .append(Component.text("\n\nScenarios » ", NamedTextColor.AQUA))
-                .append(buildScenarioList());
-    }
-
-    private Component buildScenarioList() {
-        List<ScenarioType> enabledScenarios = plugin.getScenarioManager().getEnabledScenarios();
-        if (enabledScenarios.isEmpty()) {
-            return Component.text("No active scenarios", NamedTextColor.GRAY);
-        }
-
-        Component result = Component.empty();
-        Component separator = Component.text("/", NamedTextColor.DARK_GRAY);
-
-        for (int i = 0; i < enabledScenarios.size(); i++) {
-            if (i > 0) {
-                result = result.append(separator);
-            }
-
-            ScenarioType scenario = enabledScenarios.get(i);
-            result = result.append(Component.text(scenario.getDisplayName(), NamedTextColor.GREEN)
-                    .hoverEvent(HoverEvent.showText(Component.text(scenario.getDescription(), NamedTextColor.GRAY))));
-        }
-
-        return result;
+                .append(plugin.getScenarioManager().logScenarios());
     }
 
     private void handleBorderCommand(Player player, BorderManager borderManager, String[] args) {
